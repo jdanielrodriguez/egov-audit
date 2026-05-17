@@ -1,0 +1,24 @@
+# HTTP y scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+urllib3>=2.0.0
+
+# Análisis y reportes
+pandas>=2.0.0
+numpy>=1.24.0
+openpyxl>=3.1.0
+PyYAML>=6.0
+python-dotenv>=1.0.0
+
+# Estadística y visualización
+scipy>=1.10.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Concurrencia y robustez
+tenacity>=8.2.0
+tqdm>=4.65.0
+
+# Opcional: análisis de SSL/TLS más profundo
+cryptography>=41.0.0

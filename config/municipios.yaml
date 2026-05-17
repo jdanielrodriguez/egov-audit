@@ -1,0 +1,469 @@
+# Municipalidades de la Región VI - Suroccidente de Guatemala
+# Departamentos: Quetzaltenango, Retalhuleu, San Marcos, Suchitepéquez, Totonicapán, Sololá
+#
+# Estructura por municipio:
+#   nombre: Nombre oficial
+#   departamento: Departamento
+#   url: URL oficial (None si no se ha confirmado)
+#   notas: Información adicional (opcional)
+#
+# IMPORTANTE: Las URLs deben ser verificadas antes de la auditoría.
+# El módulo src/scraper/discoverer.py puede ayudar a confirmar/encontrar URLs faltantes.
+
+municipios:
+  # ===== QUETZALTENANGO =====
+  - nombre: Quetzaltenango
+    departamento: Quetzaltenango
+    url: https://www.muniquetzaltenango.gob.gt
+    cabecera: true
+
+  - nombre: Salcajá
+    departamento: Quetzaltenango
+    url: https://www.munisalcaja.gob.gt
+    cabecera: false
+
+  - nombre: Olintepeque
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: San Carlos Sija
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Sibilia
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Cabricán
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Cajolá
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: San Miguel Sigüilá
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Ostuncalco
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: San Mateo
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Concepción Chiquirichapa
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: San Martín Sacatepéquez
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Almolonga
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Cantel
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Huitán
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Zunil
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Colomba Costa Cuca
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: San Francisco La Unión
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: El Palmar
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Coatepeque
+    departamento: Quetzaltenango
+    url: https://www.municoatepeque.gob.gt
+
+  - nombre: Génova
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Flores Costa Cuca
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: La Esperanza
+    departamento: Quetzaltenango
+    url: null
+
+  - nombre: Palestina de Los Altos
+    departamento: Quetzaltenango
+    url: null
+
+  # ===== RETALHULEU =====
+  - nombre: Retalhuleu
+    departamento: Retalhuleu
+    url: https://www.muniretalhuleu.gob.gt
+    cabecera: true
+
+  - nombre: San Sebastián
+    departamento: Retalhuleu
+    url: null
+
+  - nombre: Santa Cruz Muluá
+    departamento: Retalhuleu
+    url: null
+
+  - nombre: San Martín Zapotitlán
+    departamento: Retalhuleu
+    url: null
+
+  - nombre: San Felipe
+    departamento: Retalhuleu
+    url: null
+
+  - nombre: San Andrés Villa Seca
+    departamento: Retalhuleu
+    url: null
+
+  - nombre: Champerico
+    departamento: Retalhuleu
+    url: null
+
+  - nombre: Nuevo San Carlos
+    departamento: Retalhuleu
+    url: null
+
+  - nombre: El Asintal
+    departamento: Retalhuleu
+    url: null
+
+  # ===== SAN MARCOS =====
+  - nombre: San Marcos
+    departamento: San Marcos
+    url: https://www.munisanmarcos.gob.gt
+    cabecera: true
+
+  - nombre: San Pedro Sacatepéquez
+    departamento: San Marcos
+    url: null
+
+  - nombre: San Antonio Sacatepéquez
+    departamento: San Marcos
+    url: null
+
+  - nombre: Comitancillo
+    departamento: San Marcos
+    url: null
+
+  - nombre: San Miguel Ixtahuacán
+    departamento: San Marcos
+    url: null
+
+  - nombre: Concepción Tutuapa
+    departamento: San Marcos
+    url: null
+
+  - nombre: Tacaná
+    departamento: San Marcos
+    url: null
+
+  - nombre: Sibinal
+    departamento: San Marcos
+    url: null
+
+  - nombre: Tajumulco
+    departamento: San Marcos
+    url: null
+
+  - nombre: Tejutla
+    departamento: San Marcos
+    url: null
+
+  - nombre: San Rafael Pie de la Cuesta
+    departamento: San Marcos
+    url: null
+
+  - nombre: Nuevo Progreso
+    departamento: San Marcos
+    url: null
+
+  - nombre: El Tumbador
+    departamento: San Marcos
+    url: null
+
+  - nombre: El Rodeo
+    departamento: San Marcos
+    url: null
+
+  - nombre: Malacatán
+    departamento: San Marcos
+    url: null
+
+  - nombre: Catarina
+    departamento: San Marcos
+    url: null
+
+  - nombre: Ayutla
+    departamento: San Marcos
+    url: null
+
+  - nombre: Ocós
+    departamento: San Marcos
+    url: null
+
+  - nombre: San Pablo
+    departamento: San Marcos
+    url: null
+
+  - nombre: El Quetzal
+    departamento: San Marcos
+    url: null
+
+  - nombre: La Reforma
+    departamento: San Marcos
+    url: null
+
+  - nombre: Pajapita
+    departamento: San Marcos
+    url: null
+
+  - nombre: Ixchiguán
+    departamento: San Marcos
+    url: null
+
+  - nombre: San José Ojetenam
+    departamento: San Marcos
+    url: null
+
+  - nombre: San Cristóbal Cucho
+    departamento: San Marcos
+    url: null
+
+  - nombre: Sipacapa
+    departamento: San Marcos
+    url: null
+
+  - nombre: Esquipulas Palo Gordo
+    departamento: San Marcos
+    url: null
+
+  - nombre: Río Blanco
+    departamento: San Marcos
+    url: null
+
+  - nombre: San Lorenzo
+    departamento: San Marcos
+    url: null
+
+  - nombre: La Blanca
+    departamento: San Marcos
+    url: null
+
+  # ===== SUCHITEPÉQUEZ =====
+  - nombre: Mazatenango
+    departamento: Suchitepéquez
+    url: https://www.munimazate.gob.gt
+    cabecera: true
+
+  - nombre: Cuyotenango
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San Francisco Zapotitlán
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San Bernardino
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San José El Ídolo
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: Santo Domingo Suchitepéquez
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San Lorenzo
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: Samayac
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San Pablo Jocopilas
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San Antonio Suchitepéquez
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San Miguel Panán
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San Gabriel
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: Chicacao
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: Patulul
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: Santa Bárbara
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San Juan Bautista
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: Santo Tomás La Unión
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: Zunilito
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: Pueblo Nuevo
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: Río Bravo
+    departamento: Suchitepéquez
+    url: null
+
+  - nombre: San José La Máquina
+    departamento: Suchitepéquez
+    url: null
+
+  # ===== TOTONICAPÁN =====
+  - nombre: Totonicapán
+    departamento: Totonicapán
+    url: https://www.munitotonicapan.gob.gt
+    cabecera: true
+
+  - nombre: San Cristóbal Totonicapán
+    departamento: Totonicapán
+    url: null
+
+  - nombre: San Francisco El Alto
+    departamento: Totonicapán
+    url: null
+
+  - nombre: San Andrés Xecul
+    departamento: Totonicapán
+    url: null
+
+  - nombre: Momostenango
+    departamento: Totonicapán
+    url: null
+
+  - nombre: Santa María Chiquimula
+    departamento: Totonicapán
+    url: null
+
+  - nombre: Santa Lucía La Reforma
+    departamento: Totonicapán
+    url: null
+
+  - nombre: San Bartolo Aguas Calientes
+    departamento: Totonicapán
+    url: null
+
+  # ===== SOLOLÁ =====
+  - nombre: Sololá
+    departamento: Sololá
+    url: https://www.munisolola.gob.gt
+    cabecera: true
+
+  - nombre: San José Chacayá
+    departamento: Sololá
+    url: null
+
+  - nombre: Santa María Visitación
+    departamento: Sololá
+    url: null
+
+  - nombre: Santa Lucía Utatlán
+    departamento: Sololá
+    url: null
+
+  - nombre: Nahualá
+    departamento: Sololá
+    url: null
+
+  - nombre: Santa Catarina Ixtahuacán
+    departamento: Sololá
+    url: null
+
+  - nombre: Santa Clara La Laguna
+    departamento: Sololá
+    url: null
+
+  - nombre: Concepción
+    departamento: Sololá
+    url: null
+
+  - nombre: San Andrés Semetabaj
+    departamento: Sololá
+    url: null
+
+  - nombre: Panajachel
+    departamento: Sololá
+    url: https://www.munipanajachel.gob.gt
+
+  - nombre: Santa Catarina Palopó
+    departamento: Sololá
+    url: null
+
+  - nombre: San Antonio Palopó
+    departamento: Sololá
+    url: null
+
+  - nombre: San Lucas Tolimán
+    departamento: Sololá
+    url: null
+
+  - nombre: Santa Cruz La Laguna
+    departamento: Sololá
+    url: null
+
+  - nombre: San Pablo La Laguna
+    departamento: Sololá
+    url: null
+
+  - nombre: San Marcos La Laguna
+    departamento: Sololá
+    url: null
+
+  - nombre: San Juan La Laguna
+    departamento: Sololá
+    url: null
+
+  - nombre: San Pedro La Laguna
+    departamento: Sololá
+    url: null
+
+  - nombre: Santiago Atitlán
+    departamento: Sololá
+    url: null

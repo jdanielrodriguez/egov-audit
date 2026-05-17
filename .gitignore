@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Datos generados
+data/raw/*.json
+data/processed/*.csv
+data/reports/*.xlsx
+data/reports/*.csv
+data/reports/graficas_*/
+
+# Logs
+logs/*.log
+
+# Secretos
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Notebooks
+.ipynb_checkpoints/
