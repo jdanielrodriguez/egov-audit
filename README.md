@@ -64,7 +64,19 @@ python main.py --all --solo security
 python main.py --reporte
 ```
 
-Los reportes se generan en `data/reports/` en formato Excel (.xlsx) con múltiples hojas y gráficas, además de un CSV con datos crudos.
+Los reportes se generan en `data/reports/`:
+- **`auditoria_egov_suroccidente_YYYYMMDD.xlsx`** — Excel con 10 hojas (resumen ejecutivo, descriptiva por OE, proporciones con IC95, Kruskal-Wallis entre departamentos, correlaciones Spearman).
+- **`auditoria_egov_suroccidente_YYYYMMDD.csv`** — CSV plano con todas las métricas.
+- **`dashboard_YYYYMMDD.html`** — Dashboard HTML interactivo autocontenido (se abre en el navegador, no requiere servidor): KPIs, gráficas Chart.js, tabla filtrable y ordenable.
+- **`graficas_YYYYMMDD/`** — PNGs estáticos para incluir en la tesis.
+
+### 6. Descubrir URLs faltantes
+
+```bash
+python main.py --descubrir
+```
+
+Prueba patrones comunes de dominio (`muniNOMBRE.gob.gt`, etc.) y valida que el contenido recuperado mencione el nombre del municipio para evitar falsos positivos. El resultado se guarda en `data/processed/descubrimiento_urls.csv` para revisión manual.
 
 ## Estructura del proyecto
 
@@ -84,7 +96,8 @@ egov-audit/
 │   ├── analysis/
 │   │   └── stats.py             # Estadística descriptiva e inferencial
 │   └── reports/
-│       └── generator.py         # Exportación a Excel/CSV
+│       ├── generator.py         # Exportación a Excel/CSV + gráficas PNG
+│       └── dashboard.py         # Dashboard HTML interactivo (Chart.js)
 ├── data/
 │   ├── raw/                     # JSON crudo por municipalidad
 │   ├── processed/               # CSVs consolidados

@@ -14,6 +14,7 @@ env/
 data/raw/*.json
 data/processed/*.csv
 data/reports/*.xlsx
+data/reports/*.html
 data/reports/*.csv
 data/reports/graficas_*/
 

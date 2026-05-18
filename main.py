@@ -32,6 +32,7 @@ from src.audits.performance import auditar_performance
 from src.audits.content_freshness import auditar_freshness
 from src.audits.security import auditar_security
 from src.reports.generator import generar_reporte
+from src.reports.dashboard import generar_dashboard
 from src.logger import get_logger
 
 log = get_logger("main")
@@ -147,7 +148,7 @@ def ejecutar_descubrimiento(municipios: List[Dict[str, Any]]) -> None:
 
     hallazgos = []
     for m in tqdm(sin_url, desc="Descubriendo"):
-        r = descubrir(m["nombre"])
+        r = descubrir(m["nombre"], m.get("departamento"))
         if r:
             hallazgos.append({
                 "municipio": m["nombre"],
@@ -198,6 +199,8 @@ def main() -> int:
         df = pd.read_csv(csv_path)
         out = generar_reporte(df)
         log.info("Reporte regenerado: %s", out)
+        dash = generar_dashboard(df)
+        log.info("Dashboard regenerado: %s", dash)
         return 0
 
     if not (args.all or args.url or args.departamento):
@@ -252,10 +255,17 @@ def main() -> int:
     # Reporte
     try:
         xlsx = generar_reporte(df)
-        log.info("✅ Reporte final: %s", xlsx)
+        log.info("✅ Reporte Excel: %s", xlsx)
     except Exception as ex:
         log.exception("Error generando reporte: %s", ex)
         return 2
+
+    # Dashboard HTML
+    try:
+        dash = generar_dashboard(df)
+        log.info("✅ Dashboard HTML: %s", dash)
+    except Exception as ex:
+        log.exception("Error generando dashboard: %s", ex)
 
     return 0
 

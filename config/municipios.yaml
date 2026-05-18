@@ -1,469 +1,593 @@
 # Municipalidades de la Región VI - Suroccidente de Guatemala
-# Departamentos: Quetzaltenango, Retalhuleu, San Marcos, Suchitepéquez, Totonicapán, Sololá
+# Lista verificada contra INE/SEGEPLAN/Wikipedia (noviembre 2025).
+#
+# Conteo oficial: 110 municipios
+#   Quetzaltenango: 24
+#   Retalhuleu:      9
+#   San Marcos:     30
+#   Suchitepéquez:  20 (+1 "San José La Máquina" en proceso de regularización; incluido como opcional)
+#   Totonicapán:     8
+#   Sololá:         19
 #
 # Estructura por municipio:
-#   nombre: Nombre oficial
+#   nombre: Nombre oficial INE
 #   departamento: Departamento
-#   url: URL oficial (None si no se ha confirmado)
-#   notas: Información adicional (opcional)
+#   url: URL oficial (null si no se ha confirmado)
+#   cabecera: true si es cabecera departamental
+#   codigo_ine: código numérico INE (departamento*100 + municipio)
 #
-# IMPORTANTE: Las URLs deben ser verificadas antes de la auditoría.
-# El módulo src/scraper/discoverer.py puede ayudar a confirmar/encontrar URLs faltantes.
+# Las URLs deben verificarse antes de la auditoría.
+# Usar: `python main.py --descubrir` para intentar encontrarlas automáticamente.
 
 municipios:
-  # ===== QUETZALTENANGO =====
+  # ===== QUETZALTENANGO (24) =====
   - nombre: Quetzaltenango
     departamento: Quetzaltenango
-    url: https://www.muniquetzaltenango.gob.gt
+    codigo_ine: 901
+    url: https://munixela.gob.gt
     cabecera: true
 
   - nombre: Salcajá
     departamento: Quetzaltenango
-    url: https://www.munisalcaja.gob.gt
+    codigo_ine: 902
+    url: https://www.salcaja.gob.gt/
     cabecera: false
 
   - nombre: Olintepeque
     departamento: Quetzaltenango
+    codigo_ine: 903
     url: null
 
   - nombre: San Carlos Sija
     departamento: Quetzaltenango
+    codigo_ine: 904
     url: null
 
   - nombre: Sibilia
     departamento: Quetzaltenango
+    codigo_ine: 905
     url: null
 
   - nombre: Cabricán
     departamento: Quetzaltenango
+    codigo_ine: 906
     url: null
 
   - nombre: Cajolá
     departamento: Quetzaltenango
-    url: null
+    codigo_ine: 907
+    url: https://www.grupocajola.org
 
   - nombre: San Miguel Sigüilá
     departamento: Quetzaltenango
+    codigo_ine: 908
     url: null
 
-  - nombre: Ostuncalco
+  - nombre: San Juan Ostuncalco
     departamento: Quetzaltenango
-    url: null
+    codigo_ine: 909
+    url: https://www.munisanjuanostuncalco.gob.gt
 
   - nombre: San Mateo
     departamento: Quetzaltenango
-    url: null
+    codigo_ine: 910
+    url: https://munisanmateo.gob.gt
 
   - nombre: Concepción Chiquirichapa
     departamento: Quetzaltenango
+    codigo_ine: 911
     url: null
 
   - nombre: San Martín Sacatepéquez
     departamento: Quetzaltenango
+    codigo_ine: 912
     url: null
 
   - nombre: Almolonga
     departamento: Quetzaltenango
+    codigo_ine: 913
     url: null
 
   - nombre: Cantel
     departamento: Quetzaltenango
+    codigo_ine: 914
     url: null
 
   - nombre: Huitán
     departamento: Quetzaltenango
-    url: null
+    codigo_ine: 915
+    url: https://www.munihuitan.gob.gt
 
   - nombre: Zunil
     departamento: Quetzaltenango
+    codigo_ine: 916
     url: null
 
   - nombre: Colomba Costa Cuca
     departamento: Quetzaltenango
+    codigo_ine: 917
     url: null
 
   - nombre: San Francisco La Unión
     departamento: Quetzaltenango
-    url: null
+    codigo_ine: 918
+    url: https://municipalidadsanfranciscolaunion.gob.gt
 
   - nombre: El Palmar
     departamento: Quetzaltenango
+    codigo_ine: 919
     url: null
 
   - nombre: Coatepeque
     departamento: Quetzaltenango
-    url: https://www.municoatepeque.gob.gt
+    codigo_ine: 920
+    url: https://municoatepeque.gob.gt
 
   - nombre: Génova
     departamento: Quetzaltenango
-    url: null
+    codigo_ine: 921
+    url: https://munigenova.gob.gt
 
   - nombre: Flores Costa Cuca
     departamento: Quetzaltenango
+    codigo_ine: 922
     url: null
 
   - nombre: La Esperanza
     departamento: Quetzaltenango
-    url: null
+    codigo_ine: 923
+    url: https://www.munilaesperanza.gob.gt
 
   - nombre: Palestina de Los Altos
     departamento: Quetzaltenango
-    url: null
+    codigo_ine: 924
+    url: https://www.munipalestinadelosaltos.gob.gt
 
-  # ===== RETALHULEU =====
+  # ===== RETALHULEU (9) =====
   - nombre: Retalhuleu
     departamento: Retalhuleu
-    url: https://www.muniretalhuleu.gob.gt
+    codigo_ine: 1101
+    url: https://www.munireu.gob.gt/
     cabecera: true
 
   - nombre: San Sebastián
     departamento: Retalhuleu
+    codigo_ine: 1102
     url: null
 
   - nombre: Santa Cruz Muluá
     departamento: Retalhuleu
+    codigo_ine: 1103
     url: null
 
   - nombre: San Martín Zapotitlán
     departamento: Retalhuleu
+    codigo_ine: 1104
     url: null
 
   - nombre: San Felipe
     departamento: Retalhuleu
-    url: null
+    codigo_ine: 1105
+    url: https://munisanfelipe.gob.gt
 
   - nombre: San Andrés Villa Seca
     departamento: Retalhuleu
+    codigo_ine: 1106
     url: null
 
   - nombre: Champerico
     departamento: Retalhuleu
+    codigo_ine: 1107
     url: null
 
   - nombre: Nuevo San Carlos
     departamento: Retalhuleu
+    codigo_ine: 1108
     url: null
 
   - nombre: El Asintal
     departamento: Retalhuleu
+    codigo_ine: 1109
     url: null
 
-  # ===== SAN MARCOS =====
+  # ===== SAN MARCOS (30) =====
   - nombre: San Marcos
     departamento: San Marcos
-    url: https://www.munisanmarcos.gob.gt
+    codigo_ine: 1201
+    url: https://municipalidaddesanmarcos.gob.gt/
     cabecera: true
 
   - nombre: San Pedro Sacatepéquez
     departamento: San Marcos
+    codigo_ine: 1202
     url: null
 
   - nombre: San Antonio Sacatepéquez
     departamento: San Marcos
+    codigo_ine: 1203
     url: null
 
   - nombre: Comitancillo
     departamento: San Marcos
-    url: null
+    codigo_ine: 1204
+    url: https://municomitancillo.com.gt
 
   - nombre: San Miguel Ixtahuacán
     departamento: San Marcos
+    codigo_ine: 1205
     url: null
 
   - nombre: Concepción Tutuapa
     departamento: San Marcos
-    url: null
+    codigo_ine: 1206
+    url: https://municoncepciontutuapa.com
 
   - nombre: Tacaná
     departamento: San Marcos
+    codigo_ine: 1207
     url: null
 
   - nombre: Sibinal
     departamento: San Marcos
+    codigo_ine: 1208
     url: null
 
   - nombre: Tajumulco
     departamento: San Marcos
-    url: null
+    codigo_ine: 1209
+    url: https://www.munitajumulco.gob.gt
 
   - nombre: Tejutla
     departamento: San Marcos
+    codigo_ine: 1210
     url: null
 
   - nombre: San Rafael Pie de la Cuesta
     departamento: San Marcos
+    codigo_ine: 1211
     url: null
 
   - nombre: Nuevo Progreso
     departamento: San Marcos
+    codigo_ine: 1212
     url: null
 
   - nombre: El Tumbador
     departamento: San Marcos
-    url: null
+    codigo_ine: 1213
+    url: https://munieltumbador.gob.gt
 
-  - nombre: El Rodeo
+  - nombre: San José El Rodeo
     departamento: San Marcos
+    codigo_ine: 1214
     url: null
 
   - nombre: Malacatán
     departamento: San Marcos
+    codigo_ine: 1215
     url: null
 
   - nombre: Catarina
     departamento: San Marcos
-    url: null
+    codigo_ine: 1216
+    url: https://www.municatarina.gob.gt
 
   - nombre: Ayutla
     departamento: San Marcos
+    codigo_ine: 1217
     url: null
 
   - nombre: Ocós
     departamento: San Marcos
+    codigo_ine: 1218
     url: null
 
   - nombre: San Pablo
     departamento: San Marcos
-    url: null
+    codigo_ine: 1219
+    url: https://www.munisanpablo.gob.gt
 
   - nombre: El Quetzal
     departamento: San Marcos
+    codigo_ine: 1220
     url: null
 
   - nombre: La Reforma
     departamento: San Marcos
+    codigo_ine: 1221
     url: null
 
   - nombre: Pajapita
     departamento: San Marcos
-    url: null
+    codigo_ine: 1222
+    url: https://munipajapita.gob.gt
 
   - nombre: Ixchiguán
     departamento: San Marcos
+    codigo_ine: 1223
     url: null
 
   - nombre: San José Ojetenam
     departamento: San Marcos
-    url: null
+    codigo_ine: 1224
+    url: https://www.munisanjoseojetenam.gob.gt
 
   - nombre: San Cristóbal Cucho
     departamento: San Marcos
+    codigo_ine: 1225
     url: null
 
   - nombre: Sipacapa
     departamento: San Marcos
+    codigo_ine: 1226
     url: null
 
   - nombre: Esquipulas Palo Gordo
     departamento: San Marcos
+    codigo_ine: 1227
     url: null
 
   - nombre: Río Blanco
     departamento: San Marcos
-    url: null
+    codigo_ine: 1228
+    url: https://munirioblanco.gob.gt
 
   - nombre: San Lorenzo
     departamento: San Marcos
+    codigo_ine: 1229
     url: null
 
   - nombre: La Blanca
     departamento: San Marcos
+    codigo_ine: 1230
     url: null
 
-  # ===== SUCHITEPÉQUEZ =====
+  # ===== SUCHITEPÉQUEZ (20 oficiales + 1 en proceso) =====
   - nombre: Mazatenango
     departamento: Suchitepéquez
-    url: https://www.munimazate.gob.gt
+    codigo_ine: 1001
+    url: https://munimazate.gob.gt
     cabecera: true
 
   - nombre: Cuyotenango
     departamento: Suchitepéquez
+    codigo_ine: 1002
     url: null
 
   - nombre: San Francisco Zapotitlán
     departamento: Suchitepéquez
+    codigo_ine: 1003
     url: null
 
   - nombre: San Bernardino
     departamento: Suchitepéquez
+    codigo_ine: 1004
     url: null
 
   - nombre: San José El Ídolo
     departamento: Suchitepéquez
+    codigo_ine: 1005
     url: null
 
   - nombre: Santo Domingo Suchitepéquez
     departamento: Suchitepéquez
+    codigo_ine: 1006
     url: null
 
   - nombre: San Lorenzo
     departamento: Suchitepéquez
+    codigo_ine: 1007
     url: null
 
   - nombre: Samayac
     departamento: Suchitepéquez
-    url: null
+    codigo_ine: 1008
+    url: https://www.munisamayac.gob.gt
 
   - nombre: San Pablo Jocopilas
     departamento: Suchitepéquez
+    codigo_ine: 1009
     url: null
 
   - nombre: San Antonio Suchitepéquez
     departamento: Suchitepéquez
+    codigo_ine: 1010
     url: null
 
   - nombre: San Miguel Panán
     departamento: Suchitepéquez
+    codigo_ine: 1011
     url: null
 
   - nombre: San Gabriel
     departamento: Suchitepéquez
+    codigo_ine: 1012
     url: null
 
   - nombre: Chicacao
     departamento: Suchitepéquez
+    codigo_ine: 1013
     url: null
 
   - nombre: Patulul
     departamento: Suchitepéquez
-    url: null
+    codigo_ine: 1014
+    url: https://www.munipatulul.gob.gt
 
   - nombre: Santa Bárbara
     departamento: Suchitepéquez
+    codigo_ine: 1015
     url: null
 
   - nombre: San Juan Bautista
     departamento: Suchitepéquez
+    codigo_ine: 1016
     url: null
 
   - nombre: Santo Tomás La Unión
     departamento: Suchitepéquez
+    codigo_ine: 1017
     url: null
 
   - nombre: Zunilito
     departamento: Suchitepéquez
+    codigo_ine: 1018
     url: null
 
   - nombre: Pueblo Nuevo
     departamento: Suchitepéquez
+    codigo_ine: 1019
     url: null
 
   - nombre: Río Bravo
     departamento: Suchitepéquez
-    url: null
+    codigo_ine: 1020
+    url: https://www.muniriobravo.gob.gt
 
+  # San José La Máquina: territorio en proceso de regularización (no aparece en
+  # conteo oficial de SEGEPLAN, pero algunas fuentes lo listan como municipio 21).
+  # Si tu marco de investigación lo considera, déjalo; si no, coméntalo.
   - nombre: San José La Máquina
     departamento: Suchitepéquez
+    codigo_ine: 1021
     url: null
+    notas: Territorio en proceso de regularización - revisar antes de incluir
 
-  # ===== TOTONICAPÁN =====
+  # ===== TOTONICAPÁN (8) =====
   - nombre: Totonicapán
     departamento: Totonicapán
-    url: https://www.munitotonicapan.gob.gt
+    codigo_ine: 801
+    url: https://munitotonicapan.gob.gt
     cabecera: true
 
   - nombre: San Cristóbal Totonicapán
     departamento: Totonicapán
+    codigo_ine: 802
     url: null
 
   - nombre: San Francisco El Alto
     departamento: Totonicapán
-    url: null
+    codigo_ine: 803
+    url: https://sitio.munisanfranciscoelalto.gob.gt
 
   - nombre: San Andrés Xecul
     departamento: Totonicapán
+    codigo_ine: 804
     url: null
 
   - nombre: Momostenango
     departamento: Totonicapán
+    codigo_ine: 805
     url: null
 
   - nombre: Santa María Chiquimula
     departamento: Totonicapán
+    codigo_ine: 806
     url: null
 
   - nombre: Santa Lucía La Reforma
     departamento: Totonicapán
+    codigo_ine: 807
     url: null
 
   - nombre: San Bartolo Aguas Calientes
     departamento: Totonicapán
+    codigo_ine: 808
     url: null
 
-  # ===== SOLOLÁ =====
+  # ===== SOLOLÁ (19) =====
   - nombre: Sololá
     departamento: Sololá
-    url: https://www.munisolola.gob.gt
+    codigo_ine: 701
+    url: https://municipalidaddesolola.gob.gt/
     cabecera: true
 
   - nombre: San José Chacayá
     departamento: Sololá
+    codigo_ine: 702
     url: null
 
   - nombre: Santa María Visitación
     departamento: Sololá
+    codigo_ine: 703
     url: null
 
   - nombre: Santa Lucía Utatlán
     departamento: Sololá
-    url: null
+    codigo_ine: 704
+    url: https://www.munisantaluciautatlan.gob.gt
 
   - nombre: Nahualá
     departamento: Sololá
+    codigo_ine: 705
     url: null
 
   - nombre: Santa Catarina Ixtahuacán
     departamento: Sololá
+    codigo_ine: 706
     url: null
 
   - nombre: Santa Clara La Laguna
     departamento: Sololá
+    codigo_ine: 707
     url: null
 
   - nombre: Concepción
     departamento: Sololá
+    codigo_ine: 708
     url: null
 
   - nombre: San Andrés Semetabaj
     departamento: Sololá
+    codigo_ine: 709
     url: null
 
   - nombre: Panajachel
     departamento: Sololá
-    url: https://www.munipanajachel.gob.gt
+    codigo_ine: 710
+    url: https://municipalidaddepanajachel.gob.gt/
 
   - nombre: Santa Catarina Palopó
     departamento: Sololá
-    url: null
+    codigo_ine: 711
+    url: https://www.munisantacatarinapalopo.gob.gt
 
   - nombre: San Antonio Palopó
     departamento: Sololá
+    codigo_ine: 712
     url: null
 
   - nombre: San Lucas Tolimán
     departamento: Sololá
+    codigo_ine: 713
     url: null
 
   - nombre: Santa Cruz La Laguna
     departamento: Sololá
+    codigo_ine: 714
     url: null
 
   - nombre: San Pablo La Laguna
     departamento: Sololá
+    codigo_ine: 715
     url: null
 
   - nombre: San Marcos La Laguna
     departamento: Sololá
+    codigo_ine: 716
     url: null
 
   - nombre: San Juan La Laguna
     departamento: Sololá
+    codigo_ine: 717
     url: null
 
   - nombre: San Pedro La Laguna
     departamento: Sololá
+    codigo_ine: 718
     url: null
 
   - nombre: Santiago Atitlán
     departamento: Sololá
-    url: null
+    codigo_ine: 719
+    url: https://munisantiagoatitlan.gob.gt
