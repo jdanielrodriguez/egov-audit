@@ -1,15 +1,24 @@
 """
 Punto de entrada: orquesta todo el flujo de auditoría.
 
+v2 (mayo 2026):
+- Soporte para múltiples URLs por municipio (campo `urls:` además de `url:`)
+- Filtros por tipo de portal (oficial, transparencia_iap, alternativa)
+- Auditoría también de instituciones gubernamentales no municipales
+
 Uso:
     python main.py --all
     python main.py --url https://www.muniquetzaltenango.gob.gt
     python main.py --departamento Quetzaltenango
     python main.py --all --solo performance
-    python main.py --all --no-pagespeed --no-wayback   # más rápido / sin APIs externas
-    python main.py --reporte    # solo regenera reportes desde data/processed/
-    python main.py --descubrir  # intenta encontrar URLs faltantes
+    python main.py --all --no-pagespeed --no-wayback
+    python main.py --reporte
+    python main.py --descubrir
+    python main.py --descubrir-iap            # busca portales de transparencia IAP
+    python main.py --tipo-portal oficial      # filtrar por tipo
+    python main.py --instituciones            # auditar entidades gubernamentales no municipales
 """
+
 from __future__ import annotations
 
 import argparse
@@ -24,10 +33,14 @@ import pandas as pd
 from tqdm import tqdm
 
 from config.settings import (
-    MUNICIPIOS_YAML, RAW_DIR, PROCESSED_DIR, REQUEST_DELAY,
+    MUNICIPIOS_YAML,
+    RAW_DIR,
+    PROCESSED_DIR,
+    REQUEST_DELAY,
+    CONFIG_DIR,
 )
 from src.scraper.fetcher import fetch
-from src.scraper.discoverer import descubrir
+from src.scraper.discoverer import descubrir, descubrir_iap_transparencia
 from src.audits.performance import auditar_performance
 from src.audits.content_freshness import auditar_freshness
 from src.audits.security import auditar_security
@@ -37,6 +50,9 @@ from src.logger import get_logger
 
 log = get_logger("main")
 
+# Archivo opcional con instituciones gubernamentales no municipales
+INSTITUCIONES_YAML = CONFIG_DIR / "instituciones.yaml"
+
 
 def cargar_municipios() -> List[Dict[str, Any]]:
     with open(MUNICIPIOS_YAML, "r", encoding="utf-8") as f:
@@ -44,21 +60,119 @@ def cargar_municipios() -> List[Dict[str, Any]]:
     return data.get("municipios", [])
 
 
+def cargar_instituciones() -> List[Dict[str, Any]]:
+    """Carga instituciones gubernamentales no municipales (si existe el YAML)."""
+    if not INSTITUCIONES_YAML.exists():
+        log.info(
+            "No existe %s — se omiten instituciones no municipales", INSTITUCIONES_YAML
+        )
+        return []
+    with open(INSTITUCIONES_YAML, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    return data.get("instituciones", [])
+
+
+def expandir_urls(entidad: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Expande una entidad (municipio o institución) en una o más URLs auditables.
+
+    Soporta dos formatos en el YAML:
+
+    Formato A (simple, retrocompatible):
+        - nombre: X
+          url: https://...
+
+    Formato B (multi-URL):
+        - nombre: X
+          urls:
+            - tipo: oficial
+              url: https://...
+            - tipo: transparencia_iap
+              url: https://....iap.gob.gt
+    """
+    base = {k: v for k, v in entidad.items() if k not in ("url", "urls")}
+
+    expansions = []
+
+    # Formato A: campo "url" simple
+    if entidad.get("url"):
+        expansions.append(
+            {
+                **base,
+                "url": entidad["url"],
+                "tipo_portal": entidad.get("tipo_portal", "oficial"),
+            }
+        )
+
+    # Formato B: campo "urls" como lista
+    urls_list = entidad.get("urls", [])
+    if isinstance(urls_list, list):
+        for item in urls_list:
+            if isinstance(item, dict) and item.get("url"):
+                expansions.append(
+                    {
+                        **base,
+                        "url": item["url"],
+                        "tipo_portal": item.get("tipo", "oficial"),
+                    }
+                )
+            elif isinstance(item, str):
+                expansions.append(
+                    {
+                        **base,
+                        "url": item,
+                        "tipo_portal": "oficial",
+                    }
+                )
+
+    return expansions
+
+
 def filtrar_municipios(
     municipios: List[Dict[str, Any]],
     *,
     departamento: Optional[str] = None,
     url: Optional[str] = None,
+    tipo_portal: Optional[str] = None,
     solo_con_url: bool = True,
 ) -> List[Dict[str, Any]]:
-    out = municipios
-    if departamento:
-        out = [m for m in out if m.get("departamento", "").lower() == departamento.lower()]
+    # Si se pasa una URL específica, ignorar todo y auditar solo esa
     if url:
-        out = [{"nombre": "URL ad-hoc", "departamento": "N/A", "url": url}]
+        return [
+            {
+                "nombre": "URL ad-hoc",
+                "departamento": "N/A",
+                "url": url,
+                "tipo_portal": "ad-hoc",
+            }
+        ]
+
+    # Filtrar por departamento si se especifica
+    objetivo = municipios
+    if departamento:
+        objetivo = [
+            m
+            for m in objetivo
+            if m.get("departamento", "").lower() == departamento.lower()
+        ]
+
+    # Expandir cada entidad a una o más URLs auditables
+    expandidas: List[Dict[str, Any]] = []
+    for m in objetivo:
+        expandidas.extend(expandir_urls(m))
+
+    # Filtrar por tipo de portal si se especifica
+    if tipo_portal:
+        expandidas = [
+            m
+            for m in expandidas
+            if m.get("tipo_portal", "").lower() == tipo_portal.lower()
+        ]
+
     if solo_con_url:
-        out = [m for m in out if m.get("url")]
-    return out
+        expandidas = [m for m in expandidas if m.get("url")]
+
+    return expandidas
 
 
 def auditar_uno(
@@ -68,15 +182,18 @@ def auditar_uno(
     usar_pagespeed: bool = True,
     consultar_wayback: bool = True,
 ) -> Dict[str, Any]:
-    """Ejecuta las auditorías para un municipio. Devuelve dict consolidado."""
+    """Ejecuta las auditorías para un municipio/institución. Devuelve dict consolidado."""
     nombre = municipio.get("nombre", "N/A")
     departamento = municipio.get("departamento", "N/A")
     url = municipio.get("url")
+    tipo_portal = municipio.get("tipo_portal", "oficial")
 
     registro: Dict[str, Any] = {
         "municipio": nombre,
         "departamento": departamento,
         "url": url,
+        "tipo_portal": tipo_portal,
+        "codigo_ine": municipio.get("codigo_ine"),
         "timestamp_auditoria": pd.Timestamp.now().isoformat(),
     }
 
@@ -85,22 +202,26 @@ def auditar_uno(
         registro["reachable"] = False
         return registro
 
-    log.info("→ Auditando %s (%s) %s", nombre, departamento, url)
+    log.info("→ Auditando %s [%s] (%s) %s", nombre, tipo_portal, departamento, url)
 
     # 1) Visita
     fres = fetch(url)
-    registro.update({
-        "url_final": fres.url_final,
-        "status_code": fres.status_code,
-        "reachable": fres.reachable,
-        "ttfb_ms": fres.ttfb_ms,
-        "tiempo_total_ms": fres.tiempo_total_ms,
-        "tamanio_bytes": fres.tamanio_bytes,
-        "tamanio_kb": round(fres.tamanio_bytes / 1024, 2) if fres.tamanio_bytes else None,
-        "redirecciones": fres.redirecciones,
-        "https": fres.https,
-        "error_fetch": fres.error,
-    })
+    registro.update(
+        {
+            "url_final": fres.url_final,
+            "status_code": fres.status_code,
+            "reachable": fres.reachable,
+            "ttfb_ms": fres.ttfb_ms,
+            "tiempo_total_ms": fres.tiempo_total_ms,
+            "tamanio_bytes": fres.tamanio_bytes,
+            "tamanio_kb": (
+                round(fres.tamanio_bytes / 1024, 2) if fres.tamanio_bytes else None
+            ),
+            "redirecciones": fres.redirecciones,
+            "https": fres.https,
+            "error_fetch": fres.error,
+        }
+    )
 
     if not fres.reachable and not fres.contenido_html:
         log.warning("  No alcanzable: %s", fres.error)
@@ -116,7 +237,9 @@ def auditar_uno(
 
     if solo in (None, "freshness"):
         try:
-            registro.update(auditar_freshness(fres, consultar_wayback=consultar_wayback))
+            registro.update(
+                auditar_freshness(fres, consultar_wayback=consultar_wayback)
+            )
         except Exception as ex:
             log.exception("Error en freshness %s: %s", url, ex)
             registro["error_freshness"] = str(ex)
@@ -128,10 +251,11 @@ def auditar_uno(
             log.exception("Error en security %s: %s", url, ex)
             registro["error_security"] = str(ex)
 
-    # Guardar JSON crudo individual (sanitizar nombre y departamento)
+    # Guardar JSON crudo individual
     safe_nombre = "".join(c if c.isalnum() else "_" for c in nombre)
     safe_dep = "".join(c if c.isalnum() else "_" for c in (departamento or "N_A"))
-    raw_path = RAW_DIR / f"{safe_dep}_{safe_nombre}.json"
+    safe_tipo = "".join(c if c.isalnum() else "_" for c in tipo_portal)
+    raw_path = RAW_DIR / f"{safe_dep}_{safe_nombre}_{safe_tipo}.json"
     try:
         with open(raw_path, "w", encoding="utf-8") as f:
             json.dump(registro, f, ensure_ascii=False, indent=2, default=str)
@@ -141,20 +265,58 @@ def auditar_uno(
     return registro
 
 
-def ejecutar_descubrimiento(municipios: List[Dict[str, Any]]) -> None:
-    """Recorre municipios sin URL e intenta descubrirla."""
-    sin_url = [m for m in municipios if not m.get("url")]
-    log.info("Intentando descubrir URLs para %d municipios sin URL configurada", len(sin_url))
+def ejecutar_descubrimiento(
+    municipios: List[Dict[str, Any]],
+    *,
+    incluir_iap: bool = False,
+) -> None:
+    """Recorre municipios sin URL e intenta descubrirla. Si incluir_iap=True,
+    también prueba portales de transparencia IAP."""
+
+    def _tiene_url_oficial(m: Dict[str, Any]) -> bool:
+        if m.get("url"):
+            return True
+        urls_list = m.get("urls", [])
+        if isinstance(urls_list, list):
+            for it in urls_list:
+                if isinstance(it, dict):
+                    if it.get("tipo", "oficial") == "oficial" and it.get("url"):
+                        return True
+                elif isinstance(it, str) and it:
+                    return True
+        return False
+
+    sin_url = [m for m in municipios if not _tiene_url_oficial(m)]
+    log.info(
+        "Intentando descubrir URLs para %d municipios sin URL oficial", len(sin_url)
+    )
 
     hallazgos = []
     for m in tqdm(sin_url, desc="Descubriendo"):
+        # 1) URL oficial
         r = descubrir(m["nombre"], m.get("departamento"))
         if r:
-            hallazgos.append({
-                "municipio": m["nombre"],
-                "departamento": m.get("departamento"),
-                **r,
-            })
+            hallazgos.append(
+                {
+                    "municipio": m["nombre"],
+                    "departamento": m.get("departamento"),
+                    "tipo_portal": "oficial",
+                    **r,
+                }
+            )
+
+        # 2) Portal IAP de transparencia (opcional)
+        if incluir_iap:
+            r_iap = descubrir_iap_transparencia(m["nombre"], m.get("departamento"))
+            if r_iap:
+                hallazgos.append(
+                    {
+                        "municipio": m["nombre"],
+                        "departamento": m.get("departamento"),
+                        "tipo_portal": "transparencia_iap",
+                        **r_iap,
+                    }
+                )
 
     if hallazgos:
         df = pd.DataFrame(hallazgos)
@@ -166,31 +328,71 @@ def ejecutar_descubrimiento(municipios: List[Dict[str, Any]]) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Auditoría e-Gov Suroccidente Guatemala")
-    parser.add_argument("--all", action="store_true", help="Audita todos los municipios con URL")
+    parser = argparse.ArgumentParser(
+        description="Auditoría e-Gov Suroccidente Guatemala"
+    )
+    parser.add_argument(
+        "--all", action="store_true", help="Audita todos los municipios con URL"
+    )
     parser.add_argument("--url", help="Audita una sola URL ad-hoc")
     parser.add_argument("--departamento", help="Filtra por departamento")
-    parser.add_argument("--solo", choices=["performance", "freshness", "security"],
-                        help="Ejecuta solo una de las auditorías")
-    parser.add_argument("--no-pagespeed", action="store_true",
-                        help="Omitir consulta a Google PageSpeed Insights")
-    parser.add_argument("--no-wayback", action="store_true",
-                        help="Omitir consulta a Wayback Machine")
-    parser.add_argument("--reporte", action="store_true",
-                        help="Solo regenera el reporte desde resultados.csv")
-    parser.add_argument("--descubrir", action="store_true",
-                        help="Intenta descubrir URLs de municipios sin URL configurada")
-    parser.add_argument("--max", type=int, default=None,
-                        help="Limita el número de municipios a auditar (debug)")
+    parser.add_argument(
+        "--tipo-portal",
+        dest="tipo_portal",
+        choices=["oficial", "transparencia_iap", "alternativa", "ad-hoc"],
+        help="Filtra por tipo de portal",
+    )
+    parser.add_argument(
+        "--solo",
+        choices=["performance", "freshness", "security"],
+        help="Ejecuta solo una de las auditorías",
+    )
+    parser.add_argument(
+        "--no-pagespeed",
+        action="store_true",
+        help="Omitir consulta a Google PageSpeed Insights",
+    )
+    parser.add_argument(
+        "--no-wayback", action="store_true", help="Omitir consulta a Wayback Machine"
+    )
+    parser.add_argument(
+        "--reporte",
+        action="store_true",
+        help="Solo regenera el reporte desde resultados.csv",
+    )
+    parser.add_argument(
+        "--descubrir",
+        action="store_true",
+        help="Intenta descubrir URLs de municipios sin URL configurada",
+    )
+    parser.add_argument(
+        "--descubrir-iap",
+        dest="descubrir_iap",
+        action="store_true",
+        help="Igual que --descubrir, pero también busca portales IAP de transparencia",
+    )
+    parser.add_argument(
+        "--instituciones",
+        action="store_true",
+        help="Audita también instituciones gubernamentales (config/instituciones.yaml)",
+    )
+    parser.add_argument(
+        "--max",
+        type=int,
+        default=None,
+        help="Limita el número de URLs a auditar (debug)",
+    )
     args = parser.parse_args()
 
     municipios = cargar_municipios()
     log.info("Cargados %d municipios del YAML", len(municipios))
 
-    if args.descubrir:
-        ejecutar_descubrimiento(municipios)
+    # Modo descubrimiento (no audita)
+    if args.descubrir or args.descubrir_iap:
+        ejecutar_descubrimiento(municipios, incluir_iap=args.descubrir_iap)
         return 0
 
+    # Modo regenerar reporte (no audita)
     if args.reporte:
         csv_path = PROCESSED_DIR / "resultados.csv"
         if not csv_path.exists():
@@ -203,20 +405,31 @@ def main() -> int:
         log.info("Dashboard regenerado: %s", dash)
         return 0
 
+    # Validar que se especificó qué auditar
     if not (args.all or args.url or args.departamento):
         parser.print_help()
         return 1
 
+    # Construir lista objetivo
     objetivo = filtrar_municipios(
         municipios,
         departamento=args.departamento,
         url=args.url,
+        tipo_portal=args.tipo_portal,
         solo_con_url=not bool(args.url),
     )
+
+    # Si se pidió --instituciones, agregar también las instituciones gubernamentales
+    if args.instituciones:
+        instituciones = cargar_instituciones()
+        log.info("Cargadas %d instituciones del YAML", len(instituciones))
+        for inst in instituciones:
+            objetivo.extend(expandir_urls(inst))
+
     if args.max:
         objetivo = objetivo[: args.max]
 
-    log.info("Auditando %d municipios", len(objetivo))
+    log.info("Auditando %d URLs", len(objetivo))
     if not objetivo:
         log.warning("Nada que auditar.")
         return 0
@@ -232,16 +445,21 @@ def main() -> int:
             )
             resultados.append(r)
         except KeyboardInterrupt:
-            log.warning("Interrumpido por el usuario. Guardando resultados parciales...")
+            log.warning(
+                "Interrumpido por el usuario. Guardando resultados parciales..."
+            )
             break
         except Exception as ex:
             log.exception("Error catastrófico en %s: %s", m.get("nombre"), ex)
-            resultados.append({
-                "municipio": m.get("nombre"),
-                "departamento": m.get("departamento"),
-                "url": m.get("url"),
-                "error_general": str(ex),
-            })
+            resultados.append(
+                {
+                    "municipio": m.get("nombre"),
+                    "departamento": m.get("departamento"),
+                    "url": m.get("url"),
+                    "tipo_portal": m.get("tipo_portal", "oficial"),
+                    "error_general": str(ex),
+                }
+            )
 
         time.sleep(REQUEST_DELAY)
 
@@ -249,10 +467,14 @@ def main() -> int:
     df = pd.DataFrame(resultados)
     csv_path = PROCESSED_DIR / "resultados.csv"
     df.to_csv(csv_path, index=False)
-    log.info("Resultados consolidados: %s (%d filas, %d columnas)",
-             csv_path, len(df), len(df.columns))
+    log.info(
+        "Resultados consolidados: %s (%d filas, %d columnas)",
+        csv_path,
+        len(df),
+        len(df.columns),
+    )
 
-    # Reporte
+    # Reporte Excel
     try:
         xlsx = generar_reporte(df)
         log.info("✅ Reporte Excel: %s", xlsx)

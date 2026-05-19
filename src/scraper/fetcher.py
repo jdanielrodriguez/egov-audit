@@ -5,7 +5,11 @@ Cliente HTTP robusto.
 - Maneja redirecciones, errores SSL recoverable, timeouts.
 - Devuelve un objeto FetchResult con toda la información cruda necesaria
   para los módulos de auditoría aguas abajo.
+
+v2 (mayo 2026): suprime los InsecureRequestWarning de urllib3 cuando
+hacemos fallback de SSL (siguen registrándose como error en FetchResult.error).
 """
+
 from __future__ import annotations
 
 import time
@@ -14,6 +18,7 @@ from typing import Optional, Dict, Any
 from urllib.parse import urlparse
 
 import requests
+import urllib3
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -21,6 +26,10 @@ from config.settings import USER_AGENT, HTTP_TIMEOUT, MAX_RETRIES
 from src.logger import get_logger
 
 log = get_logger(__name__)
+
+# Suprime el warning ruidoso "InsecureRequestWarning" cuando hacemos
+# fallback de SSL. El error original sí queda registrado en FetchResult.error.
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 @dataclass
@@ -66,11 +75,13 @@ def _construir_sesion() -> requests.Session:
     adapter = HTTPAdapter(max_retries=retry)
     s.mount("http://", adapter)
     s.mount("https://", adapter)
-    s.headers.update({
-        "User-Agent": USER_AGENT,
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "es-GT,es;q=0.9,en;q=0.5",
-    })
+    s.headers.update(
+        {
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "es-GT,es;q=0.9,en;q=0.5",
+        }
+    )
     return s
 
 
@@ -131,12 +142,16 @@ def fetch(url: str, *, method: str = "GET") -> FetchResult:
                 log.warning("No se pudo decodificar HTML de %s: %s", url, ex)
 
     except requests.exceptions.SSLError as ex:
-        # Reintentar sin verificar SSL para registrar el error pero seguir auditando
-        log.warning("SSL error en %s: %s. Reintentando sin verificación.", url, ex)
+        # Reintenta sin verificar SSL para registrar el error pero seguir auditando.
+        # El warning de urllib3 ya está suprimido globalmente.
+        log.warning("SSL error en %s — reintentando sin verificación", url)
         try:
             resp = sesion.request(
-                method, url, timeout=HTTP_TIMEOUT,
-                allow_redirects=True, verify=False,
+                method,
+                url,
+                timeout=HTTP_TIMEOUT,
+                allow_redirects=True,
+                verify=False,
             )
             t_fin = time.perf_counter()
             res.status_code = resp.status_code

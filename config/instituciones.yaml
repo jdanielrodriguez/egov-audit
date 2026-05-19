@@ -1,0 +1,386 @@
+# Instituciones Gubernamentales NO municipales con presencia en el Suroccidente
+# Relevantes para ampliar el estudio de gobierno electrónico regional.
+#
+# Justificación metodológica:
+#   Aunque el alcance principal de la investigación son las municipalidades,
+#   incluir entidades gubernamentales nacionales con presencia regional
+#   permite contextualizar el estado del e-government guatemalteco completo
+#   y comparar la calidad técnica entre niveles (municipal vs nacional).
+#
+# Categorías de portales incluidos:
+#   - cabecera_departamental: Gobernación departamental
+#   - ministerio_regional: Sede regional/delegación de ministerios
+#   - autonoma: Entidades autónomas con sede en la región
+#   - transparencia_nacional: Sistema IAP y portales transversales
+#   - educacion_publica: USAC y otras universidades públicas con sede regional
+#   - salud_publica: Hospitales y áreas de salud regionales
+#
+# Estructura idéntica a municipios.yaml. Se carga con: --instituciones
+
+instituciones:
+  # ========================================================================
+  # GOBERNACIONES DEPARTAMENTALES (presencia administrativa regional directa)
+  # ========================================================================
+  - nombre: Gobernación de Quetzaltenango
+    departamento: Quetzaltenango
+    categoria: cabecera_departamental
+    nivel: departamental
+    urls: null
+
+  - nombre: Gobernación de Retalhuleu
+    departamento: Retalhuleu
+    categoria: cabecera_departamental
+    nivel: departamental
+    urls: null
+
+  - nombre: Gobernación de San Marcos
+    departamento: San Marcos
+    categoria: cabecera_departamental
+    nivel: departamental
+    urls: null
+
+  - nombre: Gobernación de Suchitepéquez
+    departamento: Suchitepéquez
+    categoria: cabecera_departamental
+    nivel: departamental
+    urls: null
+
+  - nombre: Gobernación de Totonicapán
+    departamento: Totonicapán
+    categoria: cabecera_departamental
+    nivel: departamental
+    urls: null
+
+  - nombre: Gobernación de Sololá
+    departamento: Sololá
+    categoria: cabecera_departamental
+    nivel: departamental
+    urls: null
+
+  # ========================================================================
+  # MINISTERIOS — portales centrales con servicios accesados desde la región
+  # ========================================================================
+  - nombre: Ministerio de Gobernación (MINGOB)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://mingob.gob.gt
+
+  - nombre: Ministerio de Educación (MINEDUC)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.mineduc.gob.gt
+
+  - nombre: Ministerio de Salud Pública (MSPAS)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.mspas.gob.gt
+
+  - nombre: Ministerio de Trabajo (MINTRAB)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.mintrabajo.gob.gt
+
+  - nombre: Ministerio de Economía (MINECO)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.mineco.gob.gt
+
+  - nombre: Ministerio de Finanzas Públicas (MINFIN)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.minfin.gob.gt
+
+  - nombre: Ministerio de Comunicaciones, Infraestructura y Vivienda (CIV)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.civ.gob.gt
+
+  - nombre: Ministerio de Ambiente y Recursos Naturales (MARN)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.marn.gob.gt
+
+  - nombre: Ministerio de Agricultura, Ganadería y Alimentación (MAGA)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.maga.gob.gt
+
+  - nombre: Ministerio de Cultura y Deportes (MCD)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://mcd.gob.gt
+
+  - nombre: Ministerio de Desarrollo Social (MIDES)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://mides.gob.gt
+
+  - nombre: Ministerio de Energía y Minas (MEM)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.mem.gob.gt
+
+  - nombre: Ministerio de la Defensa Nacional (MINDEF)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.mindef.mil.gt
+
+  - nombre: Ministerio de Relaciones Exteriores (MINEX)
+    departamento: Nacional
+    categoria: ministerio
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.minex.gob.gt
+
+  # ========================================================================
+  # SECRETARÍAS DE LA PRESIDENCIA
+  # ========================================================================
+  - nombre: Secretaría de Planificación y Programación (SEGEPLAN)
+    departamento: Nacional
+    categoria: secretaria
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.segeplan.gob.gt
+
+  - nombre: Secretaría de Comunicación Social (SCSPR)
+    departamento: Nacional
+    categoria: secretaria
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://comunicacion.gob.gt
+
+  - nombre: Secretaría de Seguridad Alimentaria (SESAN)
+    departamento: Nacional
+    categoria: secretaria
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.sesan.gob.gt
+
+  # ========================================================================
+  # ENTIDADES AUTÓNOMAS y DESCENTRALIZADAS
+  # ========================================================================
+  - nombre: Instituto Nacional de Estadística (INE)
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.ine.gob.gt
+
+  - nombre: Tribunal Supremo Electoral (TSE)
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.tse.org.gt
+
+  - nombre: Superintendencia de Administración Tributaria (SAT)
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://portal.sat.gob.gt
+
+  - nombre: Instituto Guatemalteco de Seguridad Social (IGSS)
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.igssgt.org
+
+  - nombre: Registro Nacional de las Personas (RENAP)
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.renap.gob.gt
+
+  - nombre: Procuraduría de los Derechos Humanos (PDH)
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.pdh.org.gt
+
+  - nombre: Contraloría General de Cuentas (CGC)
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.contraloria.gob.gt
+
+  - nombre: Ministerio Público (MP)
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.mp.gob.gt
+
+  - nombre: Organismo Judicial (OJ)
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.oj.gob.gt
+
+  - nombre: Congreso de la República
+    departamento: Nacional
+    categoria: autonoma
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.congreso.gob.gt
+
+  # ========================================================================
+  # TRANSPARENCIA / GOBIERNO ABIERTO
+  # ========================================================================
+  - nombre: GUATECOMPRAS (compras públicas)
+    departamento: Nacional
+    categoria: transparencia_nacional
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.guatecompras.gt
+
+  - nombre: Portal Nacional de Datos Abiertos
+    departamento: Nacional
+    categoria: transparencia_nacional
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://datos.gob.gt
+
+  - nombre: Sistema Nacional de Información sobre Acceso a la Información
+    departamento: Nacional
+    categoria: transparencia_nacional
+    nivel: nacional
+    urls:
+      - tipo: oficial
+        url: https://www.iaip.gob.gt
+
+  # ========================================================================
+  # PRESENCIA REGIONAL UNIVERSIDAD PÚBLICA
+  # ========================================================================
+  - nombre: USAC - Centro Universitario de Occidente (CUNOC)
+    departamento: Quetzaltenango
+    categoria: educacion_publica
+    nivel: departamental
+    urls:
+      - tipo: oficial
+        url: https://www.cunoc.edu.gt
+
+  - nombre: USAC - Centro Universitario de Sur Occidente (CUNSUROC)
+    departamento: Suchitepéquez
+    categoria: educacion_publica
+    nivel: departamental
+    urls:
+      - tipo: oficial
+        url: https://cunsuroc.usac.edu.gt
+
+  - nombre: USAC - Centro Universitario de San Marcos (CUSAM)
+    departamento: San Marcos
+    categoria: educacion_publica
+    nivel: departamental
+    urls: null
+
+  - nombre: USAC - Centro Universitario de Totonicapán (CUNTOTO)
+    departamento: Totonicapán
+    categoria: educacion_publica
+    nivel: departamental
+    urls: null
+
+  - nombre: USAC - Centro Universitario de Sololá (CUNSOL)
+    departamento: Sololá
+    categoria: educacion_publica
+    nivel: departamental
+    urls: null
+
+  # ========================================================================
+  # SALUD PÚBLICA REGIONAL (hospitales departamentales)
+  # ========================================================================
+  - nombre: Hospital Regional de Occidente (Quetzaltenango)
+    departamento: Quetzaltenango
+    categoria: salud_publica
+    nivel: departamental
+    urls: null
+
+  - nombre: Hospital Nacional de Retalhuleu
+    departamento: Retalhuleu
+    categoria: salud_publica
+    nivel: departamental
+    urls: null
+
+  - nombre: Hospital Nacional de San Marcos
+    departamento: San Marcos
+    categoria: salud_publica
+    nivel: departamental
+    urls: null
+
+  - nombre: Hospital Nacional de Mazatenango
+    departamento: Suchitepéquez
+    categoria: salud_publica
+    nivel: departamental
+    urls: null
+
+  - nombre: Hospital Nacional de Totonicapán
+    departamento: Totonicapán
+    categoria: salud_publica
+    nivel: departamental
+    urls: null
+
+  - nombre: Hospital Nacional de Sololá
+    departamento: Sololá
+    categoria: salud_publica
+    nivel: departamental
+    urls: null
