@@ -23,9 +23,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.utils import get_column_letter
-from openpyxl.chart import BarChart, Reference
 
 from config.settings import REPORTS_DIR
 from src.analysis import stats as A
@@ -454,8 +452,85 @@ def generar_reporte(df: pd.DataFrame, *, sufijo: str = "") -> Path:
         else:
             ws["A1"] = "Todas las URLs auditadas fueron alcanzables."
 
+    # H11 (opcional): Disponibilidad/uptime — solo si venimos del consolidado
+    if "uptime_pct" in df.columns:
+        ws = wb.create_sheet("11.Disponibilidad (uptime)")
+        cols_up = [c for c in ["municipio", "departamento", "url", "n_corridas",
+                               "n_exitosas", "uptime_pct", "primera_corrida",
+                               "ultima_corrida"] if c in df.columns]
+        _formatear_hoja(ws, df[cols_up].sort_values("uptime_pct"))
+
+    # OE4: Análisis de datos categóricos (consume cumple_LAIP / vulnerabilidad)
+    try:
+        oe4 = A.analisis_oe4_completo(df)
+        _agregar_hojas_oe4(wb, oe4)
+    except Exception as ex:
+        log.exception("Error en análisis OE4: %s", ex)
+
     xlsx_path = REPORTS_DIR / f"{nombre_base}.xlsx"
     wb.save(xlsx_path)
     log.info("Excel generado: %s", xlsx_path)
 
     return xlsx_path
+
+
+def _agregar_hojas_oe4(wb: Workbook, oe4: Dict[str, Any]) -> None:
+    """Inserta las hojas del análisis OE4 (χ²/Fisher + regresión logística)."""
+
+    def _hoja_chi2(nombre, titulo, key):
+        ws = wb.create_sheet(nombre)
+        ws["A1"] = titulo
+        ws["A1"].font = FONT_TITLE
+        ws.merge_cells("A1:N1")
+        tab = oe4.get(key)
+        if isinstance(tab, pd.DataFrame) and not tab.empty:
+            _formatear_hoja(ws, tab, fila_inicio=3)
+        else:
+            ws["A3"] = "Datos insuficientes para las pruebas (¿n o variabilidad?)."
+
+    _hoja_chi2("12.OE4 Chi2 LAIP",
+               "χ²/Fisher — Cumplimiento LAIP vs predictores categóricos",
+               "chi2_laip")
+    _hoja_chi2("13.OE4 Chi2 Vulnerab",
+               "χ²/Fisher — Vulnerabilidad de seguridad vs predictores",
+               "chi2_vuln")
+
+    # Regresiones logísticas
+    def _hoja_logit(nombre, titulo, coef_key, met_key):
+        ws = wb.create_sheet(nombre)
+        ws["A1"] = titulo
+        ws["A1"].font = FONT_TITLE
+        ws.merge_cells("A1:I1")
+        metricas = oe4.get(met_key, {}) or {}
+        ws["A2"] = "Métricas del modelo:"
+        ws["A2"].font = Font(bold=True)
+        fila = 3
+        for k, v in metricas.items():
+            ws.cell(row=fila, column=1, value=str(k))
+            ws.cell(row=fila, column=2, value=_valor_safe(v))
+            fila += 1
+        fila += 1
+        coef = oe4.get(coef_key)
+        if isinstance(coef, pd.DataFrame) and not coef.empty:
+            ws.cell(row=fila, column=1, value="Coeficientes:").font = Font(bold=True)
+            _formatear_hoja(ws, coef, fila_inicio=fila + 1)
+        else:
+            ws.cell(row=fila, column=1, value="No fue posible ajustar el modelo.")
+
+    _hoja_logit("14.OE4 Regresion LAIP",
+                "Regresión logística — Cumplimiento LAIP (positivo = Cumple)",
+                "logit_laip_coef", "logit_laip_metricas")
+    _hoja_logit("15.OE4 Regresion Vulnerab",
+                "Regresión logística — Vulnerabilidad (positivo = Vulnerable)",
+                "logit_vuln_coef", "logit_vuln_metricas")
+
+    # Tablas de contingencia LAIP
+    ws = wb.create_sheet("16.OE4 Contingencia LAIP")
+    ws.cell(row=1, column=1, value="Tablas de contingencia: predictor × Cumplimiento LAIP").font = FONT_TITLE
+    fila = 3
+    for predictor, tabla in (oe4.get("tablas_contingencia_laip") or {}).items():
+        ws.cell(row=fila, column=1, value=predictor).font = Font(bold=True, color="1F4E78")
+        fila += 1
+        tabla_df = tabla.reset_index()
+        _formatear_hoja(ws, tabla_df, fila_inicio=fila)
+        fila += len(tabla_df) + 3
