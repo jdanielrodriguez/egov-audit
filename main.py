@@ -25,7 +25,6 @@ import argparse
 import json
 import sys
 import time
-from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 import yaml
@@ -33,12 +32,12 @@ import pandas as pd
 from tqdm import tqdm
 
 from config.settings import (
-    MUNICIPIOS_YAML,
     RAW_DIR,
     PROCESSED_DIR,
     REQUEST_DELAY,
     CONFIG_DIR,
 )
+from src.portales import cargar_municipios, expandir_urls, filtrar_municipios
 from src.scraper.fetcher import fetch
 from src.scraper.discoverer import descubrir, descubrir_iap_transparencia
 from src.audits.performance import auditar_performance
@@ -54,12 +53,6 @@ log = get_logger("main")
 INSTITUCIONES_YAML = CONFIG_DIR / "instituciones.yaml"
 
 
-def cargar_municipios() -> List[Dict[str, Any]]:
-    with open(MUNICIPIOS_YAML, "r", encoding="utf-8") as f:
-        data = yaml.safe_load(f)
-    return data.get("municipios", [])
-
-
 def cargar_instituciones() -> List[Dict[str, Any]]:
     """Carga instituciones gubernamentales no municipales (si existe el YAML)."""
     if not INSTITUCIONES_YAML.exists():
@@ -70,109 +63,6 @@ def cargar_instituciones() -> List[Dict[str, Any]]:
     with open(INSTITUCIONES_YAML, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
     return data.get("instituciones", [])
-
-
-def expandir_urls(entidad: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """
-    Expande una entidad (municipio o institución) en una o más URLs auditables.
-
-    Soporta dos formatos en el YAML:
-
-    Formato A (simple, retrocompatible):
-        - nombre: X
-          url: https://...
-
-    Formato B (multi-URL):
-        - nombre: X
-          urls:
-            - tipo: oficial
-              url: https://...
-            - tipo: transparencia_iap
-              url: https://....iap.gob.gt
-    """
-    base = {k: v for k, v in entidad.items() if k not in ("url", "urls")}
-
-    expansions = []
-
-    # Formato A: campo "url" simple
-    if entidad.get("url"):
-        expansions.append(
-            {
-                **base,
-                "url": entidad["url"],
-                "tipo_portal": entidad.get("tipo_portal", "oficial"),
-            }
-        )
-
-    # Formato B: campo "urls" como lista
-    urls_list = entidad.get("urls", [])
-    if isinstance(urls_list, list):
-        for item in urls_list:
-            if isinstance(item, dict) and item.get("url"):
-                expansions.append(
-                    {
-                        **base,
-                        "url": item["url"],
-                        "tipo_portal": item.get("tipo", "oficial"),
-                    }
-                )
-            elif isinstance(item, str):
-                expansions.append(
-                    {
-                        **base,
-                        "url": item,
-                        "tipo_portal": "oficial",
-                    }
-                )
-
-    return expansions
-
-
-def filtrar_municipios(
-    municipios: List[Dict[str, Any]],
-    *,
-    departamento: Optional[str] = None,
-    url: Optional[str] = None,
-    tipo_portal: Optional[str] = None,
-    solo_con_url: bool = True,
-) -> List[Dict[str, Any]]:
-    # Si se pasa una URL específica, ignorar todo y auditar solo esa
-    if url:
-        return [
-            {
-                "nombre": "URL ad-hoc",
-                "departamento": "N/A",
-                "url": url,
-                "tipo_portal": "ad-hoc",
-            }
-        ]
-
-    # Filtrar por departamento si se especifica
-    objetivo = municipios
-    if departamento:
-        objetivo = [
-            m
-            for m in objetivo
-            if m.get("departamento", "").lower() == departamento.lower()
-        ]
-
-    # Expandir cada entidad a una o más URLs auditables
-    expandidas: List[Dict[str, Any]] = []
-    for m in objetivo:
-        expandidas.extend(expandir_urls(m))
-
-    # Filtrar por tipo de portal si se especifica
-    if tipo_portal:
-        expandidas = [
-            m
-            for m in expandidas
-            if m.get("tipo_portal", "").lower() == tipo_portal.lower()
-        ]
-
-    if solo_con_url:
-        expandidas = [m for m in expandidas if m.get("url")]
-
-    return expandidas
 
 
 def auditar_uno(
@@ -385,7 +275,7 @@ def main() -> int:
     args = parser.parse_args()
 
     municipios = cargar_municipios()
-    log.info("Cargados %d municipios del YAML", len(municipios))
+    log.info("Cargados %d municipios del Suroccidente", len(municipios))
 
     # Modo descubrimiento (no audita)
     if args.descubrir or args.descubrir_iap:
