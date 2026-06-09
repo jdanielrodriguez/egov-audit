@@ -5,8 +5,7 @@ name: egov-planner (plan semanal aleatorio)
 # disparar a mano desde la pestaña Actions (Run workflow).
 
 on:
-  schedule:
-    - cron: '17 6 * * 0'    # domingo 06:17 UTC ≈ 00:17 hora de Guatemala (evita el pico)
+  # Disparado por cron-job.org vía workflow_dispatch (sin schedule nativo).
   workflow_dispatch:
 
 permissions:

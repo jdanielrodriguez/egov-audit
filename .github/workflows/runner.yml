@@ -6,10 +6,8 @@ name: egov-recoleccion (corrida horaria con gate)
 # los portales del Suroccidente y commitea los snapshots a data/daily/.
 
 on:
-  schedule:
-    # minuto :17 (no :00): evita el pico global de cron → menos retrasos/descartes.
-    # Da igual el minuto exacto: el gate compara solo la HORA, no los minutos.
-    - cron: '17 * * * *'
+  # Disparado por cron-job.org vía workflow_dispatch. Se removió el schedule
+  # nativo de GitHub: era poco fiable y generaba disparos erráticos/duplicados.
   workflow_dispatch:
 
 permissions:
