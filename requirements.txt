@@ -13,8 +13,12 @@ python-dotenv>=1.0.0
 
 # Estadística y visualización
 scipy>=1.10.0
+statsmodels>=0.14.0          # OE4: regresión logística binaria
 matplotlib>=3.7.0
 seaborn>=0.12.0
+
+# Dashboard interactivo (opcional; el dashboard HTML no lo necesita)
+streamlit>=1.30.0
 
 # Concurrencia y robustez
 tenacity>=8.2.0

@@ -13,10 +13,23 @@ env/
 # Datos generados
 data/raw/*.json
 data/processed/*.csv
+data/reports/*/*.xlsx
+data/reports/*/*.html
+data/reports/*/*.csv
+data/reports/*/graficas_*/
 data/reports/*.xlsx
 data/reports/*.html
 data/reports/*.csv
 data/reports/graficas_*/
+
+# Recolección longitudinal:
+#   - data/daily/*.jsonl  SÍ se versiona (fuente de verdad; lo commitea Actions)
+#   - egov.db y consolidado son DERIVADOS regenerables → NO se versionan
+data/egov.db
+data/consolidated/*.csv
+
+# Guía de despliegue de Actions (local, por pedido del autor)
+DEPLOY_ACTIONS.md
 
 # Logs
 logs/*.log
