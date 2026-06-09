@@ -7,7 +7,7 @@ name: egov-planner (plan semanal aleatorio)
 on:
   schedule:
     - cron: '5 6 * * 0'      # domingo 06:05 UTC ≈ 00:05 hora de Guatemala
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 permissions:
   contents: write             # para commitear schedule/plan-semana.json
