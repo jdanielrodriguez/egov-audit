@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import socket
 import ssl
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, Any, Optional
 from urllib.parse import urlparse
 
@@ -35,6 +35,43 @@ log = get_logger(__name__)
 
 
 # ---------- Inspección SSL/TLS ----------
+
+def _clasificar_estado_ssl(
+    ok: bool, self_signed: Optional[bool], error_msg: Optional[str]
+) -> str:
+    """
+    Reduce el resultado del handshake TLS a UNA categoría para el análisis
+    categórico (OE4) y la definición de `tiene_vulnerabilidad`:
+
+        valido            → handshake estricto pasó (cert confiable + hostname ok)
+        autofirmado       → certificado self-signed
+        hostname_mismatch → cert válido pero no cubre el hostname solicitado
+        invalido          → otro fallo de verificación (expirado, cadena rota, …)
+        no_evaluable      → el fallo fue de red/DNS/timeout, NO del certificado
+                            (no debe contar como vulnerabilidad, sino como caída)
+
+    La clasificación se apoya en el mensaje de error de OpenSSL, que distingue
+    explícitamente self-signed / hostname mismatch / expired.
+    """
+    if ok:
+        return "valido"
+    m = (error_msg or "").lower()
+    if not m:
+        return "no_evaluable"
+    if any(t in m for t in (
+        "timeout", "networkerror", "gaierror",
+        "connectionrefused", "connection refused", "sin hostname",
+    )):
+        return "no_evaluable"
+    if any(t in m for t in (
+        "hostname mismatch", "hostname_mismatch",
+        "not valid for", "doesn't match", "does not match",
+    )):
+        return "hostname_mismatch"
+    if "self signed" in m or "self-signed" in m or self_signed:
+        return "autofirmado"
+    return "invalido"
+
 
 def _inspeccionar_ssl(hostname: str, port: int = 443) -> Dict[str, Any]:
     """
@@ -52,6 +89,7 @@ def _inspeccionar_ssl(hostname: str, port: int = 443) -> Dict[str, Any]:
         "ssl_dias_restantes": None,
         "ssl_subject_alt_names": [],
         "ssl_self_signed": None,
+        "ssl_estado": None,
     }
 
     try:
@@ -90,8 +128,13 @@ def _inspeccionar_ssl(hostname: str, port: int = 443) -> Dict[str, Any]:
 
                 out["ssl_ok"] = True
     except ssl.SSLCertVerificationError as ex:
-        out["ssl_error"] = f"CertVerificationError: {ex.reason}"
-        # Reintento ignorando verificación para extraer cert
+        # ex.reason es el código corto (p. ej. CERTIFICATE_VERIFY_FAILED);
+        # el detalle que distingue self-signed / hostname / expirado está en
+        # verify_message o en el str completo de la excepción.
+        detalle = getattr(ex, "verify_message", "") or str(ex)
+        out["ssl_error"] = f"CertVerificationError: {ex.reason}: {detalle}"
+        # Reintento ignorando verificación para extraer cert (y decidir si es
+        # autofirmado por subject == issuer).
         try:
             ctx2 = ssl.create_default_context()
             ctx2.check_hostname = False
@@ -102,7 +145,13 @@ def _inspeccionar_ssl(hostname: str, port: int = 443) -> Dict[str, Any]:
                     cert = ssock.getpeercert(binary_form=False) or {}
                     if cert:
                         subject = dict(x[0] for x in cert.get("subject", []))
+                        issuer = dict(x[0] for x in cert.get("issuer", []))
                         out["ssl_subject"] = subject.get("commonName")
+                        out["ssl_issuer"] = (
+                            issuer.get("commonName") or issuer.get("organizationName")
+                        )
+                        if subject and issuer:
+                            out["ssl_self_signed"] = (subject == issuer)
         except Exception:
             pass
     except ssl.SSLError as ex:
@@ -114,6 +163,9 @@ def _inspeccionar_ssl(hostname: str, port: int = 443) -> Dict[str, Any]:
     except Exception as ex:
         out["ssl_error"] = f"{ex.__class__.__name__}: {ex}"
 
+    out["ssl_estado"] = _clasificar_estado_ssl(
+        out["ssl_ok"], out["ssl_self_signed"], out["ssl_error"]
+    )
     return out
 
 
