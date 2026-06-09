@@ -7,7 +7,9 @@ name: egov-recoleccion (corrida horaria con gate)
 
 on:
   schedule:
-    - cron: '0 * * * *'       # cada hora en punto (UTC); Actions puede retrasarlo
+    # minuto :17 (no :00): evita el pico global de cron → menos retrasos/descartes.
+    # Da igual el minuto exacto: el gate compara solo la HORA, no los minutos.
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 permissions:
