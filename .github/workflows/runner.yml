@@ -21,7 +21,7 @@ jobs:
   recolectar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Gate: usa el python3 preinstalado del runner (no instala nada).
       - name: ¿Toca recolectar a esta hora?
@@ -30,7 +30,7 @@ jobs:
 
       - name: Configurar Python
         if: steps.gate.outputs.run == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
           cache: pip
