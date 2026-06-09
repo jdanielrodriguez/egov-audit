@@ -3,6 +3,7 @@ Configuración general del proyecto.
 Carga variables de entorno y define rutas, timeouts y constantes.
 """
 import os
+from datetime import timezone, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -17,8 +18,19 @@ PROCESSED_DIR = DATA_DIR / "processed"
 REPORTS_DIR = DATA_DIR / "reports"
 LOG_DIR = BASE_DIR / "logs"
 
-for d in (RAW_DIR, PROCESSED_DIR, REPORTS_DIR, LOG_DIR):
+# Recolección longitudinal (módulos collect/ y consolidate/)
+DAILY_DIR = DATA_DIR / "daily"                 # snapshots crudos append-only (JSONL/mes)
+CONSOLIDATED_DIR = DATA_DIR / "consolidated"   # tabla final 1 fila/portal
+SCHEDULE_DIR = BASE_DIR / "schedule"           # plan semanal aleatorio (GitHub Actions)
+SQLITE_DB = DATA_DIR / "egov.db"               # índice derivado de los JSONL (no se versiona)
+
+for d in (RAW_DIR, PROCESSED_DIR, REPORTS_DIR, LOG_DIR, DAILY_DIR, CONSOLIDATED_DIR, SCHEDULE_DIR):
     d.mkdir(parents=True, exist_ok=True)
+
+# ===== Zona horaria de Guatemala (UTC-6 fijo, sin horario de verano) =====
+# Se usa para sellar cada corrida en hora local, de modo que el análisis
+# "¿es más rápido de noche?" agrupe por la hora real de Guatemala.
+TZ_GUATEMALA = timezone(timedelta(hours=-6))
 
 MUNICIPIOS_YAML = CONFIG_DIR / "municipios.yaml"
 
