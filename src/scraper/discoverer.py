@@ -15,7 +15,6 @@ from __future__ import annotations
 import re
 import unicodedata
 from typing import List, Optional, Dict, Any, Set
-from urllib.parse import urlparse
 
 from src.scraper.fetcher import fetch
 from src.logger import get_logger

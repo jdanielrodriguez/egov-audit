@@ -3,7 +3,6 @@ Logging centralizado del proyecto.
 """
 import logging
 import sys
-from pathlib import Path
 from datetime import datetime
 
 from config.settings import LOG_DIR

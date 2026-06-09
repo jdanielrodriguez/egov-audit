@@ -21,7 +21,7 @@ import re
 import statistics
 import unicodedata
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from urllib.parse import urlparse
 
 import requests

@@ -20,14 +20,12 @@ Devuelve un dict listo para serializar a JSON / CSV.
 from __future__ import annotations
 
 from typing import Dict, Any, Optional
-from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
 
 from config.settings import (
-    PAGESPEED_API_KEY, PAGESPEED_ENDPOINT, HTTP_TIMEOUT,
-    UMBRALES_PERFORMANCE,
+    PAGESPEED_API_KEY, PAGESPEED_ENDPOINT, UMBRALES_PERFORMANCE,
 )
 from src.scraper.fetcher import FetchResult
 from src.logger import get_logger
