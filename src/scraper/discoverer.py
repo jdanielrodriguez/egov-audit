@@ -15,6 +15,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from typing import List, Optional, Dict, Any, Set
+from urllib.parse import urlparse
 
 from src.scraper.fetcher import fetch
 from src.logger import get_logger
@@ -61,6 +62,18 @@ STOPWORDS_IDENTIDAD: Set[str] = {
 
 # Memoria de URLs ya asignadas en la sesión actual (para detectar duplicados)
 _URLS_ASIGNADAS_SESION: Dict[str, str] = {}
+
+# Dominios de transparencia administrados por terceros (no son el portal OFICIAL
+# propio del municipio). El descubridor de URLs oficiales los descarta para evitar
+# falsos positivos (p. ej. municipio.laip.gt). El modo IAP sí los busca a propósito.
+DOMINIOS_NO_OFICIALES = ("laip.gt", "laip.gob.gt", "iap.gob.gt")
+
+
+def _es_dominio_no_oficial(url: Optional[str]) -> bool:
+    if not url:
+        return False
+    host = (urlparse(url).hostname or "").lower()
+    return any(host == d or host.endswith("." + d) for d in DOMINIOS_NO_OFICIALES)
 
 
 def _quitar_acentos(s: str) -> str:
@@ -274,6 +287,14 @@ def descubrir(
 
         res = fetch(cand)
         if not (res.reachable and res.status_code and res.status_code < 400):
+            continue
+
+        # Rechazar dominios de transparencia de terceros (laip.gt / iap.gob.gt):
+        # son portales LAIP administrados por el Estado, no el sitio OFICIAL propio
+        # del municipio. Evita falsos positivos como municoncepcion.laip.gt.
+        if _es_dominio_no_oficial(res.url_final):
+            log.debug("  ⊘ %s → %s es portal de transparencia (no oficial), omito",
+                      cand, res.url_final)
             continue
 
         # URL final (después de redirecciones) también debe verificarse
