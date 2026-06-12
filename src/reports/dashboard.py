@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import math
+import warnings
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List
@@ -30,6 +31,12 @@ import numpy as np
 from config.settings import REPORTS_DIR
 from src.analysis import stats as A
 from src.logger import get_logger
+
+# pandas 2.x emite un FutureWarning por el downcasting de `.fillna(False).astype(bool)`
+# sobre columnas object. No altera el resultado; lo silenciamos puntualmente.
+warnings.filterwarnings(
+    "ignore", message="Downcasting object dtype arrays", category=FutureWarning
+)
 
 log = get_logger(__name__)
 
@@ -76,6 +83,13 @@ def _calcular_kpis(df: pd.DataFrame) -> Dict[str, Any]:
         s = df[col].fillna(False).astype(bool)
         return round(s.mean() * 100, 1) if len(s) else None
 
+    def pct_nivel_laip(niveles):
+        """% de portales (evaluables) cuyo nivel_laip está en `niveles`."""
+        if "nivel_laip" not in df.columns:
+            return None
+        s = df["nivel_laip"].dropna()
+        return round(s.isin(niveles).mean() * 100, 1) if len(s) else None
+
     return {
         "total_municipios": total,
         "reachable": reachable,
@@ -89,7 +103,10 @@ def _calcular_kpis(df: pd.DataFrame) -> Dict[str, Any]:
         "pct_ssl_ok": pct("ssl_ok"),
         "pct_hsts": pct("header_hsts"),
         "pct_redirige_https": pct("redirige_a_https"),
-        "pct_cumple_laip": pct("cumple_LAIP") if "cumple_LAIP" in df.columns else None,
+        # LAIP en 3 niveles: % que alcanza al menos la mayoría (Pleno+Limitado)
+        # y % de cumplimiento pleno (los 7 apartados).
+        "pct_laip_mayoria": pct_nivel_laip(["Pleno", "Limitado"]),
+        "pct_laip_pleno": pct_nivel_laip(["Pleno"]),
         "pct_vulnerable": pct("tiene_vulnerabilidad") if "tiene_vulnerabilidad" in df.columns else None,
         "laip_medio": media("laip_pct_cumplimiento"),
         "tiempo_carga_medio_ms": media("tiempo_total_ms"),
@@ -170,14 +187,17 @@ def _payload_oe4(df: pd.DataFrame) -> Dict[str, Any]:
     df_cat = oe4.get("df_categorico")
     dist_laip, dist_vuln = {}, {}
     if isinstance(df_cat, pd.DataFrame):
-        if "cat_cumple_laip" in df_cat.columns:
-            dist_laip = df_cat["cat_cumple_laip"].dropna().value_counts().to_dict()
+        # LAIP: nivel de 3 categorías (Pleno/Limitado/No_cumple) si está; si no, la dicotomía.
+        col_laip = "cat_nivel_laip" if "cat_nivel_laip" in df_cat.columns else "cat_cumple_mayoria"
+        if col_laip in df_cat.columns:
+            dist_laip = df_cat[col_laip].dropna().value_counts().to_dict()
         if "cat_vulnerable" in df_cat.columns:
             dist_vuln = df_cat["cat_vulnerable"].dropna().value_counts().to_dict()
 
     return {
         "disponible": True,
         "umbral_laip": oe4.get("umbral_laip_usado", 50.0),
+        "var_laip": oe4.get("var_laip_chi2", ""),
         "chi2_laip": recs(oe4.get("chi2_laip")),
         "chi2_vuln": recs(oe4.get("chi2_vuln")),
         "logit_laip_coef": recs(oe4.get("logit_laip_coef")),
@@ -423,10 +443,12 @@ kpiDefs.push(
   { label:'% redirige a HTTPS', value:K.pct_redirige_https, unit:'%', clase:'oe3' },
   { label:'Score OE3 medio', value:K.score_sec, unit:'/100', clase:'oe3' }
 );
-if (K.pct_cumple_laip !== null && K.pct_cumple_laip !== undefined)
-  kpiDefs.push({ label:'% cumple LAIP (estricto)', value:K.pct_cumple_laip, unit:'%', clase:'oe4' });
+if (K.pct_laip_mayoria !== null && K.pct_laip_mayoria !== undefined)
+  kpiDefs.push({ label:'% LAIP ≥ mayoría', value:K.pct_laip_mayoria, unit:'%', clase:'oe2' });
+if (K.pct_laip_pleno !== null && K.pct_laip_pleno !== undefined)
+  kpiDefs.push({ label:'% LAIP pleno (7/7)', value:K.pct_laip_pleno, unit:'%', clase:'oe2' });
 if (K.pct_vulnerable !== null && K.pct_vulnerable !== undefined)
-  kpiDefs.push({ label:'% con vulnerabilidad', value:K.pct_vulnerable, unit:'%', clase:'oe4' });
+  kpiDefs.push({ label:'% con vulnerabilidad', value:K.pct_vulnerable, unit:'%', clase:'oe3' });
 
 const kpiGrid = document.getElementById('kpi-grid');
 kpiDefs.forEach(k => {
@@ -507,23 +529,26 @@ function renderOE4() {
   <div class="leyenda-test"><strong>Cómo leer:</strong> filas amarillas = asociación significativa (p&lt;0.05).
     <em>p_recomendado</em> usa Fisher/Monte Carlo cuando hay frecuencias esperadas &lt;5; si no, χ².
     <em>V de Cramér</em> mide la magnitud (0.10 pequeña · 0.30 mediana · 0.50 grande).
-    LAIP dicotomizado en Cumple/No cumple; Vulnerable = sin SSL válido, sin HTTPS forzado, o sin HSTS+XFO+CSP.</div>
+    LAIP en 3 niveles: <strong>Pleno</strong> (los 7 apartados) · <strong>Limitado</strong> (mayoría, ≥4) · <strong>No_cumple</strong> (&lt;4).
+    La regresión logística dicotomiza en "alcanza mayoría" (Pleno+Limitado) vs No_cumple.
+    Vulnerable = sin SSL válido, sin HTTPS forzado, o sin HSTS+XFO+CSP.</div>
   <div class="grid-2">
-    <div class="card"><h3>Distribución de Cumplimiento LAIP</h3>
+    <div class="card"><h3>Distribución del Nivel LAIP (3 categorías)</h3>
       <div class="chart-container" style="height:230px;"><canvas id="chart-dist-laip"></canvas></div></div>
     <div class="card"><h3>Distribución de Vulnerabilidad</h3>
       <div class="chart-container" style="height:230px;"><canvas id="chart-dist-vuln"></canvas></div></div>
   </div>
-  <div class="card" style="margin-top:1rem;"><h3>χ²/Fisher — Cumplimiento LAIP vs predictores</h3>${chiTable(o.chi2_laip)}</div>
+  <div class="card" style="margin-top:1rem;"><h3>χ²/Fisher — Nivel LAIP vs predictores</h3>${chiTable(o.chi2_laip)}</div>
   <div class="card" style="margin-top:1rem;"><h3>χ²/Fisher — Vulnerabilidad vs predictores</h3>${chiTable(o.chi2_vuln)}</div>
-  <div class="card" style="margin-top:1rem;"><h3>Regresión logística — Cumplimiento LAIP (positivo = Cumple)</h3>
+  <div class="card" style="margin-top:1rem;"><h3>Regresión logística — LAIP (positivo = alcanza mayoría)</h3>
     ${modelMetrics(o.logit_laip_metricas)}${logitTable(o.logit_laip_coef)}</div>
   <div class="card" style="margin-top:1rem;"><h3>Regresión logística — Vulnerabilidad (positivo = Vulnerable)</h3>
     ${modelMetrics(o.logit_vuln_metricas)}${logitTable(o.logit_vuln_coef)}</div>`;
 
   const dl=Object.keys(distLaip);
+  const colorLaip = l => (l==='Pleno'||l==='Cumple') ? COLOR.good : (l==='Limitado') ? COLOR.warn : COLOR.bad;
   if (dl.length) new Chart(document.getElementById('chart-dist-laip'), { type:'doughnut',
-    data:{ labels:dl, datasets:[{ data:dl.map(l=>distLaip[l]), backgroundColor:dl.map(l=>l==='Cumple'?COLOR.good:COLOR.bad) }] },
+    data:{ labels:dl, datasets:[{ data:dl.map(l=>distLaip[l]), backgroundColor:dl.map(colorLaip) }] },
     options:{responsive:true,maintainAspectRatio:false} });
   const dv=Object.keys(distVuln);
   if (dv.length) new Chart(document.getElementById('chart-dist-vuln'), { type:'doughnut',
