@@ -335,22 +335,6 @@
     "ultima_verificacion": "2026-06-12T13:46:32-06:00",
     "url_vigente": "https://www.munisantaluciautatlan.gob.gt"
   },
-  "708": {
-    "departamento": "Sololá",
-    "eventos": [
-      {
-        "detalle": "",
-        "evento": "descubierta",
-        "fecha": "2026-06-12",
-        "ts": "2026-06-12T13:53:56-06:00",
-        "url": "https://municoncepcion.laip.gt"
-      }
-    ],
-    "fallos_consecutivos": 0,
-    "municipio": "Concepción",
-    "ultima_verificacion": "2026-06-12T13:53:56-06:00",
-    "url_vigente": "https://municoncepcion.laip.gt"
-  },
   "710": {
     "departamento": "Sololá",
     "eventos": [
@@ -446,22 +430,6 @@
     "municipio": "San Francisco El Alto",
     "ultima_verificacion": "2026-06-12T13:30:03-06:00",
     "url_vigente": "https://sitio.munisanfranciscoelalto.gob.gt"
-  },
-  "901": {
-    "departamento": "Quetzaltenango",
-    "eventos": [
-      {
-        "detalle": "reemplaza https://munixela.gob.gt",
-        "evento": "reemplazada",
-        "fecha": "2026-06-12",
-        "ts": "2026-06-12T11:02:20-06:00",
-        "url": "https://www.muniquetzaltenango.com/"
-      }
-    ],
-    "fallos_consecutivos": 0,
-    "municipio": "Quetzaltenango",
-    "ultima_verificacion": "2026-06-12T11:02:20-06:00",
-    "url_vigente": "https://www.muniquetzaltenango.com/"
   },
   "902": {
     "departamento": "Quetzaltenango",
