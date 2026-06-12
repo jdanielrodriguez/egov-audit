@@ -1,0 +1,626 @@
+{
+  "1001": {
+    "departamento": "Suchitepéquez",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T12:40:09-06:00",
+        "url": "https://munimazate.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Mazatenango",
+    "ultima_verificacion": "2026-06-12T12:40:09-06:00",
+    "url_vigente": "https://munimazate.gob.gt"
+  },
+  "1008": {
+    "departamento": "Suchitepéquez",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T12:56:35-06:00",
+        "url": "https://www.munisamayac.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Samayac",
+    "ultima_verificacion": "2026-06-12T12:56:35-06:00",
+    "url_vigente": "https://www.munisamayac.gob.gt"
+  },
+  "1014": {
+    "departamento": "Suchitepéquez",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:10:02-06:00",
+        "url": "https://www.munipatulul.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Patulul",
+    "ultima_verificacion": "2026-06-12T13:10:02-06:00",
+    "url_vigente": "https://www.munipatulul.gob.gt"
+  },
+  "1020": {
+    "departamento": "Suchitepéquez",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:24:00-06:00",
+        "url": "https://www.muniriobravo.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Río Bravo",
+    "ultima_verificacion": "2026-06-12T13:24:00-06:00",
+    "url_vigente": "https://www.muniriobravo.gob.gt"
+  },
+  "1101": {
+    "departamento": "Retalhuleu",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:34:13-06:00",
+        "url": "https://www.munireu.gob.gt/"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Retalhuleu",
+    "ultima_verificacion": "2026-06-12T11:34:13-06:00",
+    "url_vigente": "https://www.munireu.gob.gt/"
+  },
+  "1105": {
+    "departamento": "Retalhuleu",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:43:10-06:00",
+        "url": "https://munisanfelipe.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "San Felipe",
+    "ultima_verificacion": "2026-06-12T11:43:10-06:00",
+    "url_vigente": "https://munisanfelipe.gob.gt"
+  },
+  "1108": {
+    "departamento": "Retalhuleu",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:47:40-06:00",
+        "url": "https://www.municipalidaddenuevosancarlos.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Nuevo San Carlos",
+    "ultima_verificacion": "2026-06-12T11:47:40-06:00",
+    "url_vigente": "https://www.municipalidaddenuevosancarlos.gob.gt"
+  },
+  "1109": {
+    "departamento": "Retalhuleu",
+    "eventos": [
+      {
+        "detalle": "sin reemplazo; se mantiene y re-prueba",
+        "evento": "caida",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:50:42-06:00",
+        "url": "https://munielasintal.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 1,
+    "municipio": "El Asintal",
+    "ultima_verificacion": "2026-06-12T11:50:42-06:00",
+    "url_vigente": "https://munielasintal.gob.gt"
+  },
+  "1201": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:50:43-06:00",
+        "url": "https://municipalidaddesanmarcos.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "San Marcos",
+    "ultima_verificacion": "2026-06-12T11:50:43-06:00",
+    "url_vigente": "https://municipalidaddesanmarcos.gob.gt"
+  },
+  "1204": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:56:40-06:00",
+        "url": "https://municomitancillo.com.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Comitancillo",
+    "ultima_verificacion": "2026-06-12T11:56:40-06:00",
+    "url_vigente": "https://municomitancillo.com.gt"
+  },
+  "1206": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:59:47-06:00",
+        "url": "https://municoncepciontutuapa.com"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Concepción Tutuapa",
+    "ultima_verificacion": "2026-06-12T11:59:47-06:00",
+    "url_vigente": "https://municoncepciontutuapa.com"
+  },
+  "1209": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T12:02:47-06:00",
+        "url": "https://www.munitajumulco.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Tajumulco",
+    "ultima_verificacion": "2026-06-12T12:02:47-06:00",
+    "url_vigente": "https://www.munitajumulco.gob.gt"
+  },
+  "1213": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T12:10:19-06:00",
+        "url": "https://munieltumbador.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "El Tumbador",
+    "ultima_verificacion": "2026-06-12T12:10:19-06:00",
+    "url_vigente": "https://munieltumbador.gob.gt"
+  },
+  "1216": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T12:14:48-06:00",
+        "url": "https://www.municatarina.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Catarina",
+    "ultima_verificacion": "2026-06-12T12:14:48-06:00",
+    "url_vigente": "https://www.municatarina.gob.gt"
+  },
+  "1219": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T12:17:47-06:00",
+        "url": "https://www.munisanpablo.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "San Pablo",
+    "ultima_verificacion": "2026-06-12T12:17:47-06:00",
+    "url_vigente": "https://www.munisanpablo.gob.gt"
+  },
+  "1222": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T12:23:46-06:00",
+        "url": "https://munipajapita.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Pajapita",
+    "ultima_verificacion": "2026-06-12T12:23:46-06:00",
+    "url_vigente": "https://munipajapita.gob.gt"
+  },
+  "1224": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "sin reemplazo; se mantiene y re-prueba",
+        "evento": "caida",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T12:28:08-06:00",
+        "url": "https://www.munisanjoseojetenam.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 1,
+    "municipio": "San José Ojetenam",
+    "ultima_verificacion": "2026-06-12T12:28:08-06:00",
+    "url_vigente": "https://www.munisanjoseojetenam.gob.gt"
+  },
+  "1228": {
+    "departamento": "San Marcos",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T12:34:08-06:00",
+        "url": "https://munirioblanco.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Río Blanco",
+    "ultima_verificacion": "2026-06-12T12:34:08-06:00",
+    "url_vigente": "https://munirioblanco.gob.gt"
+  },
+  "701": {
+    "departamento": "Sololá",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:43:32-06:00",
+        "url": "https://municipalidaddesolola.gob.gt/"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Sololá",
+    "ultima_verificacion": "2026-06-12T13:43:32-06:00",
+    "url_vigente": "https://municipalidaddesolola.gob.gt/"
+  },
+  "702": {
+    "departamento": "Sololá",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:43:33-06:00",
+        "url": "https://sanjosechacaya.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "San José Chacayá",
+    "ultima_verificacion": "2026-06-12T13:43:33-06:00",
+    "url_vigente": "https://sanjosechacaya.gob.gt"
+  },
+  "704": {
+    "departamento": "Sololá",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:46:32-06:00",
+        "url": "https://www.munisantaluciautatlan.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Santa Lucía Utatlán",
+    "ultima_verificacion": "2026-06-12T13:46:32-06:00",
+    "url_vigente": "https://www.munisantaluciautatlan.gob.gt"
+  },
+  "708": {
+    "departamento": "Sololá",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "descubierta",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:53:56-06:00",
+        "url": "https://municoncepcion.laip.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Concepción",
+    "ultima_verificacion": "2026-06-12T13:53:56-06:00",
+    "url_vigente": "https://municoncepcion.laip.gt"
+  },
+  "710": {
+    "departamento": "Sololá",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:56:57-06:00",
+        "url": "https://municipalidaddepanajachel.gob.gt/"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Panajachel",
+    "ultima_verificacion": "2026-06-12T13:56:57-06:00",
+    "url_vigente": "https://municipalidaddepanajachel.gob.gt/"
+  },
+  "711": {
+    "departamento": "Sololá",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:56:58-06:00",
+        "url": "https://www.munisantacatarinapalopo.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Santa Catarina Palopó",
+    "ultima_verificacion": "2026-06-12T13:56:58-06:00",
+    "url_vigente": "https://www.munisantacatarinapalopo.gob.gt"
+  },
+  "713": {
+    "departamento": "Sololá",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:59:54-06:00",
+        "url": "https://www.munisanlucas.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "San Lucas Tolimán",
+    "ultima_verificacion": "2026-06-12T13:59:54-06:00",
+    "url_vigente": "https://www.munisanlucas.gob.gt"
+  },
+  "719": {
+    "departamento": "Sololá",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T14:14:58-06:00",
+        "url": "https://munisantiagoatitlan.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Santiago Atitlán",
+    "ultima_verificacion": "2026-06-12T14:14:58-06:00",
+    "url_vigente": "https://munisantiagoatitlan.gob.gt"
+  },
+  "801": {
+    "departamento": "Totonicapán",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:27:00-06:00",
+        "url": "https://munitotonicapan.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Totonicapán",
+    "ultima_verificacion": "2026-06-12T13:27:00-06:00",
+    "url_vigente": "https://munitotonicapan.gob.gt"
+  },
+  "803": {
+    "departamento": "Totonicapán",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T13:30:03-06:00",
+        "url": "https://sitio.munisanfranciscoelalto.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "San Francisco El Alto",
+    "ultima_verificacion": "2026-06-12T13:30:03-06:00",
+    "url_vigente": "https://sitio.munisanfranciscoelalto.gob.gt"
+  },
+  "901": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "reemplaza https://munixela.gob.gt",
+        "evento": "reemplazada",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:02:20-06:00",
+        "url": "https://www.muniquetzaltenango.com/"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Quetzaltenango",
+    "ultima_verificacion": "2026-06-12T11:02:20-06:00",
+    "url_vigente": "https://www.muniquetzaltenango.com/"
+  },
+  "902": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "sin reemplazo; se mantiene y re-prueba",
+        "evento": "caida",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:03:45-06:00",
+        "url": "https://www.salcaja.gob.gt/"
+      }
+    ],
+    "fallos_consecutivos": 1,
+    "municipio": "Salcajá",
+    "ultima_verificacion": "2026-06-12T11:03:45-06:00",
+    "url_vigente": "https://www.salcaja.gob.gt/"
+  },
+  "907": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "sin reemplazo; se mantiene y re-prueba",
+        "evento": "caida",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:14:02-06:00",
+        "url": "https://www.municajola.com"
+      }
+    ],
+    "fallos_consecutivos": 1,
+    "municipio": "Cajolá",
+    "ultima_verificacion": "2026-06-12T11:14:02-06:00",
+    "url_vigente": "https://www.municajola.com"
+  },
+  "909": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:17:27-06:00",
+        "url": "https://www.munisanjuanostuncalco.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "San Juan Ostuncalco",
+    "ultima_verificacion": "2026-06-12T11:17:27-06:00",
+    "url_vigente": "https://www.munisanjuanostuncalco.gob.gt"
+  },
+  "910": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:17:29-06:00",
+        "url": "https://munisanmateo.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "San Mateo",
+    "ultima_verificacion": "2026-06-12T11:17:29-06:00",
+    "url_vigente": "https://munisanmateo.gob.gt"
+  },
+  "915": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:25:39-06:00",
+        "url": "https://www.munihuitan.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Huitán",
+    "ultima_verificacion": "2026-06-12T11:25:39-06:00",
+    "url_vigente": "https://www.munihuitan.gob.gt"
+  },
+  "918": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:29:35-06:00",
+        "url": "https://municipalidadsanfranciscolaunion.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "San Francisco La Unión",
+    "ultima_verificacion": "2026-06-12T11:29:35-06:00",
+    "url_vigente": "https://municipalidadsanfranciscolaunion.gob.gt"
+  },
+  "920": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:32:35-06:00",
+        "url": "https://municoatepeque.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Coatepeque",
+    "ultima_verificacion": "2026-06-12T11:32:35-06:00",
+    "url_vigente": "https://municoatepeque.gob.gt"
+  },
+  "921": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:32:39-06:00",
+        "url": "https://munigenova.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Génova",
+    "ultima_verificacion": "2026-06-12T11:32:39-06:00",
+    "url_vigente": "https://munigenova.gob.gt"
+  },
+  "923": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:34:09-06:00",
+        "url": "https://www.munilaesperanza.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "La Esperanza",
+    "ultima_verificacion": "2026-06-12T11:34:09-06:00",
+    "url_vigente": "https://www.munilaesperanza.gob.gt"
+  },
+  "924": {
+    "departamento": "Quetzaltenango",
+    "eventos": [
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-06-12",
+        "ts": "2026-06-12T11:34:12-06:00",
+        "url": "https://www.munipalestinadelosaltos.gob.gt"
+      }
+    ],
+    "fallos_consecutivos": 0,
+    "municipio": "Palestina de Los Altos",
+    "ultima_verificacion": "2026-06-12T11:34:12-06:00",
+    "url_vigente": "https://www.munipalestinadelosaltos.gob.gt"
+  }
+}
