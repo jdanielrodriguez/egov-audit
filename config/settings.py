@@ -33,6 +33,11 @@ for d in (RAW_DIR, PROCESSED_DIR, REPORTS_DIR, LOG_DIR, DAILY_DIR, CONSOLIDATED_
 TZ_GUATEMALA = timezone(timedelta(hours=-6))
 
 MUNICIPIOS_YAML = CONFIG_DIR / "municipios.yaml"
+# Actualización automática de URLs (workflow semanal). NO se toca municipios.yaml:
+#   - urls_overrides.json: URLs descubiertas/reemplazadas que se fusionan en la carga
+#   - url_registro.json:   historial (descubierta/reemplazada/caída/reactivada) con fechas
+URLS_OVERRIDES_JSON = CONFIG_DIR / "urls_overrides.json"
+URL_REGISTRO_JSON = CONFIG_DIR / "url_registro.json"
 
 # ===== HTTP =====
 USER_AGENT = os.getenv(

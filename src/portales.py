@@ -7,22 +7,70 @@ formatos de YAML (url simple vs lista de urls por tipo).
 """
 from __future__ import annotations
 
+import json
 from typing import List, Dict, Any, Optional
 
 import yaml
 
-from config.settings import MUNICIPIOS_YAML
+from config.settings import MUNICIPIOS_YAML, URLS_OVERRIDES_JSON
 from src.logger import get_logger
 
 log = get_logger(__name__)
 
 
-def cargar_municipios() -> List[Dict[str, Any]]:
-    """Carga la lista de municipios del Suroccidente (config/municipios.yaml)."""
+def _clave_municipio(m: Dict[str, Any]) -> str:
+    """Clave estable para casar un municipio con su override (código INE o nombre)."""
+    return str(m.get("codigo_ine") or m.get("nombre") or "")
+
+
+def _cargar_overrides() -> Dict[str, Any]:
+    """Lee config/urls_overrides.json (URLs descubiertas/reemplazadas). {} si no existe."""
+    if not URLS_OVERRIDES_JSON.exists():
+        return {}
+    try:
+        with open(URLS_OVERRIDES_JSON, "r", encoding="utf-8") as f:
+            return json.load(f) or {}
+    except (json.JSONDecodeError, OSError) as ex:
+        log.warning("No se pudo leer %s: %s", URLS_OVERRIDES_JSON.name, ex)
+        return {}
+
+
+def _aplicar_overrides(municipios: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Fusiona los overrides sobre la lista del YAML SIN modificar el archivo.
+    Un override (por código INE / nombre) define la URL oficial vigente del
+    municipio: gana sobre lo que diga el YAML. El municipios.yaml curado queda
+    intacto en disco.
+    """
+    overrides = _cargar_overrides()
+    if not overrides:
+        return municipios
+    aplicados = 0
+    for m in municipios:
+        ov = overrides.get(_clave_municipio(m))
+        if ov and ov.get("url"):
+            m["url"] = ov["url"]
+            m["urls"] = None  # la URL oficial del override es la vigente
+            m["_url_fuente"] = "override"
+            aplicados += 1
+    if aplicados:
+        log.info("Aplicados %d overrides de URL sobre el catálogo", aplicados)
+    return municipios
+
+
+def cargar_municipios(aplicar_overrides: bool = True) -> List[Dict[str, Any]]:
+    """
+    Carga la lista de municipios del Suroccidente (config/municipios.yaml) y,
+    por defecto, fusiona los overrides de URL (config/urls_overrides.json) que
+    haya generado el workflow de actualización.
+    """
     with open(MUNICIPIOS_YAML, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
+    municipios = data.get("municipios", [])
     log.info("Municipios cargados desde %s", MUNICIPIOS_YAML.name)
-    return data.get("municipios", [])
+    if aplicar_overrides:
+        municipios = _aplicar_overrides(municipios)
+    return municipios
 
 
 def expandir_urls(entidad: Dict[str, Any]) -> List[Dict[str, Any]]:
