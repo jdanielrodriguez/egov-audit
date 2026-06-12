@@ -262,6 +262,17 @@ def main() -> int:
         help="Igual que --descubrir, pero también busca portales IAP de transparencia",
     )
     parser.add_argument(
+        "--escribir",
+        action="store_true",
+        help=(
+            "Con --descubrir: modo actualización del catálogo. Verifica las URLs "
+            "en uso, reemplaza las que fallan (si encuentra alternativa), descubre "
+            "las vacías y escribe config/urls_overrides.json + url_registro.json. "
+            "NO genera CSV ni toca municipios.yaml. Sin esta flag, --descubrir solo "
+            "genera el reporte CSV (comportamiento clásico)."
+        ),
+    )
+    parser.add_argument(
         "--instituciones",
         action="store_true",
         help="Audita también instituciones gubernamentales (config/instituciones.yaml)",
@@ -279,7 +290,14 @@ def main() -> int:
 
     # Modo descubrimiento (no audita)
     if args.descubrir or args.descubrir_iap:
-        ejecutar_descubrimiento(municipios, incluir_iap=args.descubrir_iap)
+        if args.escribir:
+            # Modo actualización del catálogo (workflow semanal): verifica/reemplaza/
+            # descubre y escribe overrides + registro JSON; no genera CSV.
+            from src.scraper.url_updater import actualizar_catalogo
+            resumen = actualizar_catalogo(escribir=True)
+            print(json.dumps(resumen, ensure_ascii=False, indent=2, default=str))
+        else:
+            ejecutar_descubrimiento(municipios, incluir_iap=args.descubrir_iap)
         return 0
 
     # Modo regenerar reporte (no audita)
