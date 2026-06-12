@@ -179,13 +179,28 @@ def _consolidar_portal(
         vals = sub[col].dropna()
         return vals.iloc[0] if len(vals) else None
 
+    # URL representativa = la URL OFICIAL más reciente (la vigente del municipio).
+    # Si cambió de dominio, las mediciones viejas y nuevas ya están unidas en este
+    # grupo (agrupamos por codigo_ine). Se prefiere tipo_portal=oficial sobre
+    # alternativas (p. ej. Cajolá: oficial municajola.com vs alternativa ONG).
+    sub_ord = sub.sort_values("run_ts")
+    oficiales = sub_ord[sub_ord["tipo_portal"] == "oficial"]["url"].dropna()
+    cualquiera = sub_ord["url"].dropna()
+    if len(oficiales):
+        url_vigente = oficiales.iloc[-1]
+    elif len(cualquiera):
+        url_vigente = cualquiera.iloc[-1]
+    else:
+        url_vigente = None
+
     fila: Dict[str, Any] = {
         "municipio": _id("municipio"),
         "departamento": _id("departamento"),
         "codigo_ine": _id("codigo_ine"),
         "cabecera": bool(_id("cabecera")) if _id("cabecera") is not None else False,
         "tipo_portal": _id("tipo_portal"),
-        "url": _id("url"),
+        "url": url_vigente,
+        "n_urls_distintas": int(sub["url"].nunique()),  # >1 = el municipio cambió de URL
         "n_corridas": n_corridas,
         "n_exitosas": n_exitosas,
         "uptime_pct": round(n_exitosas / n_corridas * 100, 2) if n_corridas else 0.0,
@@ -280,13 +295,19 @@ def consolidar(
         log.warning("No hay snapshots para consolidar.")
         return pd.DataFrame()
 
+    # Unidad de análisis = el municipio. Agrupamos por codigo_ine para que un
+    # cambio de URL (o varias URLs del mismo municipio) cuente como UN registro,
+    # no varios. Fallback a 'url' si faltara el código INE.
+    df = df_snapshots.copy()
+    df["_clave_muni"] = df["codigo_ine"].where(df["codigo_ine"].notna(), df["url"])
+
     filas: List[Dict[str, Any]] = []
-    for url, sub in df_snapshots.groupby("url", dropna=True):
+    for _clave, sub in df.groupby("_clave_muni", dropna=True):
         filas.append(_consolidar_portal(sub, apartados_obligatorios))
 
     consolidado = pd.DataFrame(filas)
     log.info(
-        "Consolidados %d portales desde %d snapshots",
+        "Consolidados %d municipios desde %d snapshots",
         len(consolidado), len(df_snapshots),
     )
 
