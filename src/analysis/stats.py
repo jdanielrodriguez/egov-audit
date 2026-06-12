@@ -259,10 +259,21 @@ def preparar_variables_categoricas(
         ).apply(_categorizar_calidad_tecnica)
 
     # ---- Respuesta 1: cumplimiento LAIP ----
-    if "cumple_LAIP" in df.columns:
-        out["cat_cumple_laip"] = _resp_binaria(df["cumple_LAIP"], "Cumple", "No cumple")
+    # Variable principal: nivel_laip de 3 categorías ordinales (Pleno / Limitado /
+    # No_cumple), para χ²/Fisher/Cramér (tablas RxC). Además, una dicotomía
+    # 'cat_cumple_mayoria' (alcanza al menos la mayoría) para la regresión
+    # logística binaria.
+    if "nivel_laip" in df.columns:
+        out["cat_nivel_laip"] = df["nivel_laip"].apply(
+            lambda v: None if v is None or (isinstance(v, float) and pd.isna(v)) else str(v)
+        )
+        out["cat_cumple_mayoria"] = out["cat_nivel_laip"].apply(
+            lambda v: None if v is None else ("Cumple" if v in ("Pleno", "Limitado") else "No cumple")
+        )
+    elif "cumple_LAIP" in df.columns:
+        out["cat_cumple_mayoria"] = _resp_binaria(df["cumple_LAIP"], "Cumple", "No cumple")
     elif "laip_pct_cumplimiento" in df.columns:
-        out["cat_cumple_laip"] = pd.to_numeric(
+        out["cat_cumple_mayoria"] = pd.to_numeric(
             df["laip_pct_cumplimiento"], errors="coerce"
         ).apply(lambda v: None if pd.isna(v) else ("Cumple" if v >= umbral_laip else "No cumple"))
 
@@ -476,15 +487,20 @@ def analisis_oe4_completo(
         "cat_departamento", "cat_cabecera", "cat_tipo_hosting", "cat_calidad_tecnica"
     ) if c in df_cat.columns]
 
-    chi2_laip = pruebas_chi_cuadrado(df_cat, "cat_cumple_laip", predictores) \
-        if "cat_cumple_laip" in df_cat.columns else pd.DataFrame()
+    # χ²/Fisher/Cramér de LAIP: sobre el nivel de 3 categorías (Pleno/Limitado/
+    # No_cumple) si está disponible; si no, sobre la dicotomía.
+    var_laip_chi2 = "cat_nivel_laip" if "cat_nivel_laip" in df_cat.columns else "cat_cumple_mayoria"
+    chi2_laip = pruebas_chi_cuadrado(df_cat, var_laip_chi2, predictores) \
+        if var_laip_chi2 in df_cat.columns else pd.DataFrame()
     chi2_vuln = pruebas_chi_cuadrado(df_cat, "cat_vulnerable", predictores) \
         if "cat_vulnerable" in df_cat.columns else pd.DataFrame()
 
-    coef_laip, met_laip = (None, {"error": "sin variable cat_cumple_laip"})
-    if "cat_cumple_laip" in df_cat.columns:
+    # Regresión logística binaria de LAIP: sobre la dicotomía "alcanza al menos
+    # la mayoría" (Pleno+Limitado = Cumple) vs No_cumple.
+    coef_laip, met_laip = (None, {"error": "sin variable cat_cumple_mayoria"})
+    if "cat_cumple_mayoria" in df_cat.columns:
         coef_laip, met_laip = regresion_logistica_binaria(
-            df_cat, "cat_cumple_laip", predictores, "Cumple"
+            df_cat, "cat_cumple_mayoria", predictores, "Cumple"
         )
     coef_vuln, met_vuln = (None, {"error": "sin variable cat_vulnerable"})
     if "cat_vulnerable" in df_cat.columns:
@@ -494,10 +510,15 @@ def analisis_oe4_completo(
 
     tablas_cont = {}
     for p in predictores:
-        if "cat_cumple_laip" in df_cat.columns:
-            t = tabla_contingencia(df_cat, p, "cat_cumple_laip")
+        if var_laip_chi2 in df_cat.columns:
+            t = tabla_contingencia(df_cat, p, var_laip_chi2)
             if t is not None:
                 tablas_cont[p.replace("cat_", "")] = t
+
+    # Distribución del nivel LAIP (3 categorías) para los reportes
+    dist_nivel_laip = {}
+    if "cat_nivel_laip" in df_cat.columns:
+        dist_nivel_laip = df_cat["cat_nivel_laip"].dropna().value_counts().to_dict()
 
     return {
         "df_categorico": df_cat,
@@ -508,5 +529,7 @@ def analisis_oe4_completo(
         "logit_vuln_coef": coef_vuln,
         "logit_vuln_metricas": met_vuln,
         "tablas_contingencia_laip": tablas_cont,
+        "dist_nivel_laip": {str(k): int(v) for k, v in dist_nivel_laip.items()},
+        "var_laip_chi2": var_laip_chi2,
         "umbral_laip_usado": umbral_laip,
     }

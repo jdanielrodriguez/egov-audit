@@ -43,9 +43,33 @@ APARTADOS_LAIP_OBLIGATORIOS: Sequence[str] = (
     "transparencia", "presupuesto", "compras", "personal",
     "servicios", "estructura", "contacto",
 )
+TOTAL_APARTADOS_LAIP = len(APARTADOS_LAIP_OBLIGATORIOS)   # 7
+# "Mayoría" = más de la mitad de los 7 apartados → ≥ 4.
+UMBRAL_MAYORIA_LAIP = 4
 
 # Severidad de ssl_estado para el desempate de la moda (peor primero).
 _SEVERIDAD_SSL = ["invalido", "autofirmado", "hostname_mismatch", "no_evaluable", "valido"]
+
+
+def clasificar_nivel_laip(
+    apartados_presentes: Optional[int],
+    total: int = TOTAL_APARTADOS_LAIP,
+    umbral_mayoria: int = UMBRAL_MAYORIA_LAIP,
+) -> Optional[str]:
+    """
+    Nivel de cumplimiento LAIP en 3 categorías ordinales:
+        Pleno      → presenta TODOS los apartados (cumplimiento perfecto)
+        Limitado   → presenta la mayoría (≥ umbral) pero no todos
+        No_cumple  → presenta menos de la mayoría
+    Devuelve None si el portal no tuvo corridas exitosas (no evaluable).
+    """
+    if apartados_presentes is None:
+        return None
+    if apartados_presentes >= total:
+        return "Pleno"
+    if apartados_presentes >= umbral_mayoria:
+        return "Limitado"
+    return "No_cumple"
 
 
 # ---------------------------------------------------------------------------
@@ -207,12 +231,16 @@ def _consolidar_portal(
     if n_exitosas == 0:
         fila["laip_apartados_presentes"] = None
         fila["cumple_LAIP"] = None
+        fila["nivel_laip"] = None
         fila["tiene_vulnerabilidad"] = None
     else:
         presentes = [bool(fila.get(f"laip_{ap}_modal")) for ap in APARTADOS_LAIP_OBLIGATORIOS]
         fila["laip_apartados_presentes"] = int(sum(presentes))
         obligatorios = [bool(fila.get(f"laip_{ap}_modal")) for ap in apartados_obligatorios]
+        # cumple_LAIP (0/1, estricto): se conserva como hallazgo descriptivo.
         fila["cumple_LAIP"] = int(all(obligatorios)) if obligatorios else None
+        # nivel_laip (3 niveles ordinales): variable principal para el OE4.
+        fila["nivel_laip"] = clasificar_nivel_laip(fila["laip_apartados_presentes"])
 
         ssl_malo = fila["ssl_estado_modal"] in {"invalido", "autofirmado", "hostname_mismatch"}
         sin_redir = fila["redirige_https_modal"] is False
