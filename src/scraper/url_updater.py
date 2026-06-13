@@ -89,9 +89,29 @@ def _registrar(registro, clave, m, evento, url, detalle="") -> Dict[str, Any]:
     return r
 
 
-def _responde(url: str) -> bool:
+# Un reemplazo solo se hace tras esta cantidad de fallos (muerte real) seguidos,
+# para no reemplazar por una baja temporal de un solo sábado.
+UMBRAL_FALLOS_REEMPLAZO = 2
+
+# Códigos en que el servidor RESPONDE pero deniega al bot (WAF / anti-bot /
+# rate-limit). El sitio existe → NO es una caída ni motivo de reemplazo.
+ESTADOS_RESTRINGIDO = (401, 403, 429)
+
+
+def _estado_url(url: str) -> str:
+    """
+    Clasifica una URL:
+      'vivo'        → 2xx/3xx (en línea).
+      'restringido' → 401/403/429: existe pero bloquea al bot. NO es caída.
+      'muerto'      → 404, 5xx, timeout, DNS o error de conexión (caída real).
+    """
     res = fetch(url)
-    return bool(res.reachable and res.status_code and res.status_code < 400)
+    sc = res.status_code
+    if sc in ESTADOS_RESTRINGIDO:
+        return "restringido"
+    if res.reachable and sc and 200 <= sc < 400:
+        return "vivo"
+    return "muerto"
 
 
 def actualizar_catalogo(*, escribir: bool = False) -> Dict[str, Any]:
@@ -103,7 +123,7 @@ def actualizar_catalogo(*, escribir: bool = False) -> Dict[str, Any]:
     overrides = _cargar_json(URLS_OVERRIDES_JSON)
     registro = _cargar_json(URL_REGISTRO_JSON)
     resumen: Dict[str, Any] = {
-        "verificadas_ok": 0, "reactivadas": 0, "reemplazadas": 0,
+        "verificadas_ok": 0, "reactivadas": 0, "restringidas": 0, "reemplazadas": 0,
         "descubiertas": 0, "caidas": 0, "sin_url": 0, "cambios": [],
     }
 
@@ -112,9 +132,12 @@ def actualizar_catalogo(*, escribir: bool = False) -> Dict[str, Any]:
         url = _url_oficial(m)
 
         if url:
-            if _responde(url):
-                eventos = registro.get(clave, {}).get("eventos", [])
-                era_caida = bool(eventos) and eventos[-1].get("evento") == "caida"
+            estado = _estado_url(url)
+            eventos = registro.get(clave, {}).get("eventos", [])
+            ultimo = eventos[-1].get("evento") if eventos else None
+
+            if estado == "vivo":
+                era_caida = ultimo in ("caida", "restringido")
                 _registrar(registro, clave, m, "reactivada" if era_caida else "verificada_ok", url)
                 registro[clave]["fallos_consecutivos"] = 0
                 if era_caida:
@@ -122,22 +145,43 @@ def actualizar_catalogo(*, escribir: bool = False) -> Dict[str, Any]:
                     resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "reactivada", "url": url})
                 else:
                     resumen["verificadas_ok"] += 1
-            else:
-                hallazgo = descubrir(m["nombre"], m.get("departamento"))
-                nueva = hallazgo.get("url_funcional") if hallazgo else None
-                if nueva and nueva.rstrip("/") != url.rstrip("/"):
-                    overrides[clave] = {"url": nueva, "tipo_portal": "oficial",
-                                        "fuente": "reemplazo", "fecha": _hoy(),
-                                        "url_anterior": url}
-                    _registrar(registro, clave, m, "reemplazada", nueva, f"reemplaza {url}")
-                    registro[clave]["fallos_consecutivos"] = 0
-                    resumen["reemplazadas"] += 1
-                    resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "reemplazada", "de": url, "a": nueva})
+
+            elif estado == "restringido":
+                # El sitio EXISTE pero bloquea al bot (403/401/429). No es caída:
+                # se mantiene, no se reemplaza y no cuenta como fallo.
+                _registrar(registro, clave, m, "restringido", url,
+                           "acceso restringido (403/401/429); el sitio existe, se mantiene")
+                registro[clave]["fallos_consecutivos"] = 0
+                resumen["restringidas"] += 1
+
+            else:  # muerto (404, 5xx, timeout, DNS, conexión)
+                fallos = registro.get(clave, {}).get("fallos_consecutivos", 0) + 1
+                # Solo se busca reemplazo tras UMBRAL fallos seguidos (evita baja temporal).
+                if fallos >= UMBRAL_FALLOS_REEMPLAZO:
+                    hallazgo = descubrir(m["nombre"], m.get("departamento"))
+                    nueva = hallazgo.get("url_funcional") if hallazgo else None
+                    if nueva and nueva.rstrip("/") != url.rstrip("/"):
+                        overrides[clave] = {"url": nueva, "tipo_portal": "oficial",
+                                            "fuente": "reemplazo", "fecha": _hoy(),
+                                            "url_anterior": url}
+                        _registrar(registro, clave, m, "reemplazada", nueva,
+                                   f"reemplaza {url} tras {fallos} fallos seguidos")
+                        registro[clave]["fallos_consecutivos"] = 0
+                        resumen["reemplazadas"] += 1
+                        resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "reemplazada", "de": url, "a": nueva})
+                    else:
+                        r = _registrar(registro, clave, m, "caida", url,
+                                       f"muerta {fallos}x, sin reemplazo; se mantiene")
+                        r["fallos_consecutivos"] = fallos
+                        resumen["caidas"] += 1
+                        resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "caida", "url": url})
                 else:
-                    r = _registrar(registro, clave, m, "caida", url, "sin reemplazo; se mantiene y re-prueba")
-                    r["fallos_consecutivos"] = r.get("fallos_consecutivos", 0) + 1
+                    # 1er fallo: puede ser baja temporal. Se registra y se re-prueba
+                    # el próximo sábado; aún NO se busca reemplazo.
+                    r = _registrar(registro, clave, m, "caida", url,
+                                   f"muerta {fallos}x; se re-prueba (umbral reemplazo={UMBRAL_FALLOS_REEMPLAZO})")
+                    r["fallos_consecutivos"] = fallos
                     resumen["caidas"] += 1
-                    resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "caida", "url": url})
         else:
             hallazgo = descubrir(m["nombre"], m.get("departamento"))
             nueva = hallazgo.get("url_funcional") if hallazgo else None
@@ -153,11 +197,11 @@ def actualizar_catalogo(*, escribir: bool = False) -> Dict[str, Any]:
     if escribir:
         _guardar_json(URLS_OVERRIDES_JSON, overrides)
         _guardar_json(URL_REGISTRO_JSON, registro)
-        log.info("Catálogo ESCRITO. ok=%d reactiv=%d reempl=%d nuevas=%d caidas=%d",
-                 resumen["verificadas_ok"], resumen["reactivadas"], resumen["reemplazadas"],
-                 resumen["descubiertas"], resumen["caidas"])
+        log.info("Catálogo ESCRITO. ok=%d reactiv=%d restring=%d reempl=%d nuevas=%d caidas=%d",
+                 resumen["verificadas_ok"], resumen["reactivadas"], resumen["restringidas"],
+                 resumen["reemplazadas"], resumen["descubiertas"], resumen["caidas"])
     else:
-        log.info("Catálogo verificado (sin escribir). ok=%d reempl=%d nuevas=%d caidas=%d",
-                 resumen["verificadas_ok"], resumen["reemplazadas"],
+        log.info("Catálogo verificado (sin escribir). ok=%d restring=%d reempl=%d nuevas=%d caidas=%d",
+                 resumen["verificadas_ok"], resumen["restringidas"], resumen["reemplazadas"],
                  resumen["descubiertas"], resumen["caidas"])
     return resumen
