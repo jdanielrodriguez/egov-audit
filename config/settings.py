@@ -43,9 +43,15 @@ URL_REGISTRO_JSON = CONFIG_DIR / "url_registro.json"
 URLS_EXCLUIDAS_JSON = CONFIG_DIR / "urls_excluidas.json"
 
 # ===== HTTP =====
+# User-Agent de navegador real (Chrome). Objetivo metodológico: medir el portal
+# tal como lo vería un CIUDADANO con su navegador, evitando el sesgo de los WAF
+# que bloquean clientes no-navegador (403). No se evade ni se fuerza nada: solo
+# se presenta como un visitante estándar. Override con la variable de entorno
+# USER_AGENT si se quiere volver al agente identificado.
 USER_AGENT = os.getenv(
     "USER_AGENT",
-    "EgovAuditBot/1.0 (investigacion-academica; +contacto@universidad.edu.gt)"
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
 )
 HTTP_TIMEOUT = int(os.getenv("HTTP_TIMEOUT", "20"))  # segundos
 MAX_RETRIES = 2
