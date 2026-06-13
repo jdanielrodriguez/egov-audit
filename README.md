@@ -121,10 +121,12 @@ En `data/reports/`:
 ## Esquema de datos
 
 ### Snapshot diario — `data/daily/YYYY-MM.jsonl` (1 línea por portal por corrida)
-`run_id`, `run_ts` (hora de Guatemala), `run_date`, `run_hour`, identidad del portal, `reachable`, `ttfb_ms`, `tiempo_total_ms`, `tamanio_kb`, `tiene_viewport`, `https`, `redirige_a_https`, `ssl_estado`, headers de seguridad, `laip_*` (7 apartados). Append-only: es la **fuente de verdad versionada** en git.
+`run_id`, `run_ts` (hora de Guatemala), `run_date`, `run_hour`, identidad del portal, `reachable`, `reachable_navegador`, `ttfb_ms`, `tiempo_total_ms`, `tamanio_kb`, `tiene_viewport`, `https`, `redirige_a_https`, `ssl_estado`, headers de seguridad, `laip_*` (7 apartados). Append-only: es la **fuente de verdad versionada** en git.
+
+> `reachable` = alcanzable por el cliente HTTP (de aquí salen TTFB, SSL, headers y LAIP). Si el cliente HTTP **no** la alcanza, la corrida hace **un** 2º intento con un navegador real (Playwright); `reachable_navegador` registra si un humano sí habría podido cargarla. Así el *uptime* refleja la disponibilidad real y no un bloqueo anti-bot. No reintenta en bucle ni mide TTFB/SSL por navegador (esas métricas siguen siendo solo HTTP, comparables en toda la serie).
 
 ### Tabla consolidada — `data/consolidated/` (1 fila por portal — **unidad de análisis**)
-- `uptime_pct` = % de corridas exitosas sobre el total.
+- `uptime_pct` = % de corridas **alcanzables** (HTTP **o** navegador) sobre el total. `n_exitosas` cuenta solo las HTTP (fuente de las métricas); `n_alcanzables` añade las validadas por navegador.
 - Continuas (mediana + desviación, solo corridas exitosas): `ttfb_mediana`, `tiempo_total_mediana`, `tamanio_kb_mediana`.
 - Modales (solo exitosas): `ssl_estado_modal`, `header_*_modal`, `viewport_modal`, `laip_*_modal`.
 - **Variables dependientes:**
@@ -164,11 +166,11 @@ egov-audit/
 └── analizar.py                  # consolida + reportes del estudio longitudinal
 ```
 
-Los tres workflows se disparan vía **cron-job.org** (`workflow_dispatch`), no con el `schedule` nativo de GitHub (poco fiable): `planner.yml` sortea las corridas, `runner.yml` recolecta, y `actualizar-urls.yml` mantiene el catálogo semanalmente (instala Chromium para el 2º intento). Detalles en [`DEPLOY_ACTIONS.md`](DEPLOY_ACTIONS.md).
+Los tres workflows se disparan vía **cron-job.org** (`workflow_dispatch`), no con el `schedule` nativo de GitHub (poco fiable): `planner.yml` sortea las corridas, `runner.yml` recolecta, y `actualizar-urls.yml` mantiene el catálogo semanalmente. Tanto `runner.yml` como `actualizar-urls.yml` instalan Chromium para el 2º intento con navegador. Detalles en [`DEPLOY_ACTIONS.md`](DEPLOY_ACTIONS.md).
 
 ## Metodología
 
-1. **Recolección:** cada portal se visita una vez por corrida, con un User-Agent y cabeceras de un navegador real (para que los WAF no devuelvan 403 a un visitante legítimo) y timeouts. La modalidad longitudinal repite la corrida a horas y días aleatorios para descorrelacionar el sesgo por hora del día y por día de la semana.
+1. **Recolección:** cada portal se visita una vez por corrida, con un User-Agent y cabeceras de un navegador real (para que los WAF no devuelvan 403 a un visitante legítimo) y timeouts. Si el cliente HTTP no alcanza el sitio, se hace **un** 2º intento con un navegador real (Playwright) para validar de forma humana la disponibilidad (`reachable_navegador`) sin reintentar en bucle. La modalidad longitudinal repite la corrida a horas y días aleatorios para descorrelacionar el sesgo por hora del día y por día de la semana.
 2. **Rendimiento (OE1):** TTFB, tiempo total, peso, viewport móvil, `lang`, `alt`.
 3. **Frescura y transparencia (OE2):** snapshots de Wayback (2021–2026) y presencia de los apartados de los artículos 10–11 del Decreto 57-2008.
 4. **Seguridad (OE3):** validación de la cadena SSL con clasificación única (`ssl_estado`), versión TLS, headers OWASP y forzado de HTTPS.
