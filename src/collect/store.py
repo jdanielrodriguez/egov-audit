@@ -50,7 +50,8 @@ SNAPSHOT_FIELDS: List[str] = [
     "tipo_portal",
     "url",
     # Disponibilidad
-    "reachable",
+    "reachable",            # alcanzable por el cliente HTTP (fuente de las métricas)
+    "reachable_navegador",  # 2º intento: alcanzable por navegador real (validación humana)
     "status_code",
     "error_fetch",
     # Rendimiento (lo volátil que varía con la carga del servidor)

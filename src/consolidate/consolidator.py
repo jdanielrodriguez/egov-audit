@@ -172,8 +172,19 @@ def _consolidar_portal(
 ) -> Dict[str, Any]:
     """Reduce todas las corridas de un portal (mismo url) a una fila."""
     n_corridas = len(sub)
-    exitosas = sub[sub["reachable"].fillna(False).astype(bool)]
+    # exitosas = alcanzadas por el cliente HTTP → de aquí salen TODAS las métricas
+    # (TTFB, SSL, headers, LAIP). El navegador no las mide, así que no entran aquí.
+    reach_http = sub["reachable"].fillna(False).astype(bool)
+    exitosas = sub[reach_http]
     n_exitosas = len(exitosas)
+    # alcanzable = HTTP O navegador (validación humana del 2º intento). Es la base
+    # del uptime "real": un sitio que un humano sí carga cuenta como disponible.
+    if "reachable_navegador" in sub.columns:
+        reach_nav = sub["reachable_navegador"].eq(True)  # None/NaN → False, sin downcast
+        alcanzable = reach_http | reach_nav
+    else:
+        alcanzable = reach_http
+    n_alcanzables = int(alcanzable.sum())
 
     def _id(col):
         vals = sub[col].dropna()
@@ -202,8 +213,9 @@ def _consolidar_portal(
         "url": url_vigente,
         "n_urls_distintas": int(sub["url"].nunique()),  # >1 = el municipio cambió de URL
         "n_corridas": n_corridas,
-        "n_exitosas": n_exitosas,
-        "uptime_pct": round(n_exitosas / n_corridas * 100, 2) if n_corridas else 0.0,
+        "n_exitosas": n_exitosas,            # solo HTTP (fuente de métricas)
+        "n_alcanzables": n_alcanzables,      # HTTP o navegador (validación humana)
+        "uptime_pct": round(n_alcanzables / n_corridas * 100, 2) if n_corridas else 0.0,
         "primera_corrida": sub["run_ts"].min(),
         "ultima_corrida": sub["run_ts"].max(),
     }
@@ -383,9 +395,11 @@ def a_formato_reporte(df_consolidado: pd.DataFrame) -> pd.DataFrame:
         if src in df.columns and dst not in df.columns:
             df[dst] = df[src]
 
-    # reachable: en el consolidado, "alcanzable" = tuvo al menos una corrida exitosa
-    if "n_exitosas" in df.columns and "reachable" not in df.columns:
-        df["reachable"] = df["n_exitosas"].fillna(0).astype(int) > 0
+    # reachable: en el consolidado, "alcanzable" = tuvo al menos una corrida en la
+    # que respondió por HTTP O por navegador (validación humana del 2º intento).
+    col_alcance = "n_alcanzables" if "n_alcanzables" in df.columns else "n_exitosas"
+    if col_alcance in df.columns and "reachable" not in df.columns:
+        df["reachable"] = df[col_alcance].fillna(0).astype(int) > 0
 
     # ssl_ok / https desde ssl_estado_modal
     if "ssl_estado_modal" in df.columns:

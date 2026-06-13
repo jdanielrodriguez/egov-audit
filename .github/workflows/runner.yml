@@ -39,6 +39,10 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: pip install -r requirements.txt
 
+      - name: Instalar navegador Chromium (Playwright, validación humana)
+        if: steps.gate.outputs.run == 'true'
+        run: python -m playwright install --with-deps chromium
+
       - name: Corrida de recolección (Suroccidente)
         if: steps.gate.outputs.run == 'true'
         env:

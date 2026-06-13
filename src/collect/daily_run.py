@@ -22,6 +22,7 @@ from typing import Any, Dict, List, Optional
 from config.settings import TZ_GUATEMALA, REQUEST_DELAY
 from src.portales import cargar_municipios, filtrar_municipios
 from src.scraper.fetcher import fetch
+from src.scraper.navegador import verificar_con_navegador
 from src.audits.performance import auditar_performance
 from src.audits.security import auditar_security
 from src.audits.content_freshness import auditar_freshness
@@ -65,6 +66,7 @@ def _auditar_portal(
     fres = fetch(url)
     reg.update({
         "reachable": fres.reachable,
+        "reachable_navegador": None,
         "status_code": fres.status_code,
         "error_fetch": fres.error,
         "ttfb_ms": fres.ttfb_ms,
@@ -73,7 +75,22 @@ def _auditar_portal(
         "https": fres.https,
     })
 
-    # Si no respondió ni dejó HTML, no hay nada más que medir (queda como caída).
+    # 2º intento "humano": si el cliente HTTP no la alcanzó, se re-prueba una vez
+    # con un navegador real (Playwright). Un humano con navegador puede cargar un
+    # sitio que rechaza al cliente HTTP (WAF / challenge JS); así el uptime refleja
+    # la disponibilidad real, no el bloqueo anti-bot. NO reintenta en bucle y NO
+    # toca las métricas (TTFB/SSL/LAIP siguen viniendo del fetch HTTP, comparables).
+    # Si Playwright no está instalado, devuelve 'no_disponible' y no cambia nada.
+    if not fres.reachable:
+        estado_nav = verificar_con_navegador(url)
+        if estado_nav in ("vivo", "restringido"):
+            reg["reachable_navegador"] = True
+        elif estado_nav == "muerto":
+            reg["reachable_navegador"] = False
+        # 'no_disponible' → se deja None (no se pudo validar con navegador)
+
+    # Si ni el cliente HTTP ni el HTML están disponibles, no hay nada que medir;
+    # queda registrada la disponibilidad (HTTP y, si aplica, navegador).
     if not fres.reachable and not fres.contenido_html:
         return reg
 
