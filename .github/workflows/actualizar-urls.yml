@@ -32,6 +32,9 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements.txt
 
+      - name: Instalar navegador Chromium (Playwright, para el 2º intento)
+        run: python -m playwright install --with-deps chromium
+
       - name: Actualizar catálogo de URLs (verificar / reemplazar / descubrir)
         run: python main.py --descubrir --escribir
 

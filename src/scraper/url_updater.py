@@ -31,6 +31,7 @@ from config.settings import URLS_OVERRIDES_JSON, URL_REGISTRO_JSON, TZ_GUATEMALA
 from src.portales import cargar_municipios, expandir_urls, _clave_municipio
 from src.scraper.fetcher import fetch
 from src.scraper.discoverer import descubrir
+from src.scraper.navegador import verificar_con_navegador
 from src.logger import get_logger
 
 log = get_logger(__name__)
@@ -154,34 +155,54 @@ def actualizar_catalogo(*, escribir: bool = False) -> Dict[str, Any]:
                 registro[clave]["fallos_consecutivos"] = 0
                 resumen["restringidas"] += 1
 
-            else:  # muerto (404, 5xx, timeout, DNS, conexión)
-                fallos = registro.get(clave, {}).get("fallos_consecutivos", 0) + 1
-                # Solo se busca reemplazo tras UMBRAL fallos seguidos (evita baja temporal).
-                if fallos >= UMBRAL_FALLOS_REEMPLAZO:
-                    hallazgo = descubrir(m["nombre"], m.get("departamento"))
-                    nueva = hallazgo.get("url_funcional") if hallazgo else None
-                    if nueva and nueva.rstrip("/") != url.rstrip("/"):
-                        overrides[clave] = {"url": nueva, "tipo_portal": "oficial",
-                                            "fuente": "reemplazo", "fecha": _hoy(),
-                                            "url_anterior": url}
-                        _registrar(registro, clave, m, "reemplazada", nueva,
-                                   f"reemplaza {url} tras {fallos} fallos seguidos")
-                        registro[clave]["fallos_consecutivos"] = 0
-                        resumen["reemplazadas"] += 1
-                        resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "reemplazada", "de": url, "a": nueva})
+            else:  # 'muerto' con el cliente HTTP → 2º intento con navegador real
+                estado_nav = verificar_con_navegador(url)
+                if estado_nav == "vivo":
+                    era_caida = ultimo in ("caida", "restringido")
+                    _registrar(registro, clave, m, "reactivada" if era_caida else "verificada_ok", url,
+                               "confirmado en línea con navegador (Playwright); el cliente HTTP fue bloqueado")
+                    registro[clave]["fallos_consecutivos"] = 0
+                    if era_caida:
+                        resumen["reactivadas"] += 1
+                        resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "reactivada", "url": url})
                     else:
+                        resumen["verificadas_ok"] += 1
+
+                elif estado_nav == "restringido":
+                    _registrar(registro, clave, m, "restringido", url,
+                               "restringido confirmado con navegador; el sitio existe, se mantiene")
+                    registro[clave]["fallos_consecutivos"] = 0
+                    resumen["restringidas"] += 1
+
+                else:
+                    # 'muerto' confirmado por el navegador, o 'no_disponible' (Playwright
+                    # no instalado): se aplica la regla de fallos + umbral de reemplazo.
+                    fallos = registro.get(clave, {}).get("fallos_consecutivos", 0) + 1
+                    if fallos >= UMBRAL_FALLOS_REEMPLAZO:
+                        hallazgo = descubrir(m["nombre"], m.get("departamento"))
+                        nueva = hallazgo.get("url_funcional") if hallazgo else None
+                        if nueva and nueva.rstrip("/") != url.rstrip("/"):
+                            overrides[clave] = {"url": nueva, "tipo_portal": "oficial",
+                                                "fuente": "reemplazo", "fecha": _hoy(),
+                                                "url_anterior": url}
+                            _registrar(registro, clave, m, "reemplazada", nueva,
+                                       f"reemplaza {url} tras {fallos} fallos seguidos")
+                            registro[clave]["fallos_consecutivos"] = 0
+                            resumen["reemplazadas"] += 1
+                            resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "reemplazada", "de": url, "a": nueva})
+                        else:
+                            r = _registrar(registro, clave, m, "caida", url,
+                                           f"muerta {fallos}x (incl. navegador), sin reemplazo; se mantiene")
+                            r["fallos_consecutivos"] = fallos
+                            resumen["caidas"] += 1
+                            resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "caida", "url": url})
+                    else:
+                        # 1er fallo: puede ser baja temporal. Se registra y se re-prueba;
+                        # aún NO se busca reemplazo.
                         r = _registrar(registro, clave, m, "caida", url,
-                                       f"muerta {fallos}x, sin reemplazo; se mantiene")
+                                       f"muerta {fallos}x; se re-prueba (umbral reemplazo={UMBRAL_FALLOS_REEMPLAZO})")
                         r["fallos_consecutivos"] = fallos
                         resumen["caidas"] += 1
-                        resumen["cambios"].append({"municipio": m.get("nombre"), "evento": "caida", "url": url})
-                else:
-                    # 1er fallo: puede ser baja temporal. Se registra y se re-prueba
-                    # el próximo sábado; aún NO se busca reemplazo.
-                    r = _registrar(registro, clave, m, "caida", url,
-                                   f"muerta {fallos}x; se re-prueba (umbral reemplazo={UMBRAL_FALLOS_REEMPLAZO})")
-                    r["fallos_consecutivos"] = fallos
-                    resumen["caidas"] += 1
         else:
             hallazgo = descubrir(m["nombre"], m.get("departamento"))
             nueva = hallazgo.get("url_funcional") if hallazgo else None

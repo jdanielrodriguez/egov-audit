@@ -26,3 +26,9 @@ tqdm>=4.65.0
 
 # Opcional: análisis de SSL/TLS más profundo
 cryptography>=41.0.0
+
+# Segundo intento del descubrimiento con navegador real (Playwright headless).
+# Solo lo usa el workflow de actualización de URLs cuando un sitio parece caído,
+# para descartar bloqueos anti-bot / challenges JS. Requiere además, una vez:
+#   playwright install chromium
+playwright>=1.40.0
