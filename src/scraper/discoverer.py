@@ -12,11 +12,13 @@ v3 (mayo 2026) — CORRECCIÓN CRÍTICA tras encontrar falsos positivos:
 
 from __future__ import annotations
 
+import json
 import re
 import unicodedata
 from typing import List, Optional, Dict, Any, Set
 from urllib.parse import urlparse
 
+from config.settings import URLS_EXCLUIDAS_JSON
 from src.scraper.fetcher import fetch
 from src.logger import get_logger
 
@@ -74,6 +76,35 @@ def _es_dominio_no_oficial(url: Optional[str]) -> bool:
         return False
     host = (urlparse(url).hostname or "").lower()
     return any(host == d or host.endswith("." + d) for d in DOMINIOS_NO_OFICIALES)
+
+
+def _dominio(url: Optional[str]) -> str:
+    """hostname en minúsculas y sin 'www.' (clave para la lista negra)."""
+    host = (urlparse(url).hostname or "").lower() if url else ""
+    return host[4:] if host.startswith("www.") else host
+
+
+_URLS_VETADAS_CACHE: Optional[Set[str]] = None
+
+
+def _urls_vetadas() -> Set[str]:
+    """Dominios de la lista negra editable a mano (config/urls_excluidas.json)."""
+    global _URLS_VETADAS_CACHE
+    if _URLS_VETADAS_CACHE is None:
+        _URLS_VETADAS_CACHE = set()
+        if URLS_EXCLUIDAS_JSON.exists():
+            try:
+                data = json.loads(URLS_EXCLUIDAS_JSON.read_text(encoding="utf-8"))
+                _URLS_VETADAS_CACHE = {_dominio(u) for u in data.get("vetadas", []) if u}
+            except (json.JSONDecodeError, OSError) as ex:
+                log.warning("No se pudo leer %s: %s", URLS_EXCLUIDAS_JSON.name, ex)
+    return _URLS_VETADAS_CACHE
+
+
+def _es_url_vetada(url: Optional[str]) -> bool:
+    """True si el dominio de `url` está en la lista negra manual."""
+    d = _dominio(url)
+    return bool(d) and d in _urls_vetadas()
 
 
 def _quitar_acentos(s: str) -> str:
@@ -275,6 +306,11 @@ def descubrir(
     log.debug("  → %d candidatas", len(candidatas))
 
     for cand in candidatas:
+        # Lista negra manual: nunca proponer un sitio vetado (fraudulento, etc.)
+        if _es_url_vetada(cand):
+            log.debug("  ⊘ %s está en la lista negra, omito", cand)
+            continue
+
         # Normalizar URL para comparar contra registro de sesión
         cand_norm = cand.rstrip("/").lower().replace("https://www.", "https://")
 
@@ -289,11 +325,11 @@ def descubrir(
         if not (res.reachable and res.status_code and res.status_code < 400):
             continue
 
-        # Rechazar dominios de transparencia de terceros (laip.gt / iap.gob.gt):
-        # son portales LAIP administrados por el Estado, no el sitio OFICIAL propio
-        # del municipio. Evita falsos positivos como municoncepcion.laip.gt.
-        if _es_dominio_no_oficial(res.url_final):
-            log.debug("  ⊘ %s → %s es portal de transparencia (no oficial), omito",
+        # Rechazar: (a) dominios de transparencia de terceros (laip.gt/iap.gob.gt),
+        # que no son el sitio OFICIAL propio; (b) dominios en la lista negra manual
+        # (sitios fraudulentos/parqueados validados a mano). Cubre redirecciones.
+        if _es_dominio_no_oficial(res.url_final) or _es_url_vetada(res.url_final):
+            log.debug("  ⊘ %s → %s descartado (transparencia o lista negra), omito",
                       cand, res.url_final)
             continue
 

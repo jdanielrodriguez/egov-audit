@@ -38,6 +38,9 @@ MUNICIPIOS_YAML = CONFIG_DIR / "municipios.yaml"
 #   - url_registro.json:   historial (descubierta/reemplazada/caída/reactivada) con fechas
 URLS_OVERRIDES_JSON = CONFIG_DIR / "urls_overrides.json"
 URL_REGISTRO_JSON = CONFIG_DIR / "url_registro.json"
+# Lista negra editable a mano: dominios/URLs validados como NO oficiales que el
+# descubridor debe omitir (p. ej. sitios fraudulentos o parqueados).
+URLS_EXCLUIDAS_JSON = CONFIG_DIR / "urls_excluidas.json"
 
 # ===== HTTP =====
 USER_AGENT = os.getenv(

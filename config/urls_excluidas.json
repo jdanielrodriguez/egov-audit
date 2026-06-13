@@ -1,0 +1,6 @@
+{
+  "descripcion": "Lista negra de URLs/dominios validados MANUALMENTE como NO oficiales (fraudulentos, parqueados, de terceros). El descubridor los OMITE y nunca reemplaza un portal con ellos. Para vetar un sitio: copiá su URL (o solo el dominio) y agregala a 'vetadas'. El veto es por dominio (cubre con/sin www y cualquier ruta).",
+  "vetadas": [
+    "https://www.muniquetzaltenango.com/"
+  ]
+}
