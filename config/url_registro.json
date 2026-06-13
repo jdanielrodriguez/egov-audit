@@ -620,22 +620,6 @@
     "ultima_verificacion": "2026-06-12T19:50:13-06:00",
     "url_vigente": "https://sitio.munisanfranciscoelalto.gob.gt"
   },
-  "901": {
-    "departamento": "Quetzaltenango",
-    "eventos": [
-      {
-        "detalle": "reemplaza https://munixela.gob.gt",
-        "evento": "reemplazada",
-        "fecha": "2026-06-12",
-        "ts": "2026-06-12T16:37:26-06:00",
-        "url": "https://www.muniquetzaltenango.com/"
-      }
-    ],
-    "fallos_consecutivos": 0,
-    "municipio": "Quetzaltenango",
-    "ultima_verificacion": "2026-06-12T16:37:26-06:00",
-    "url_vigente": "https://www.muniquetzaltenango.com/"
-  },
   "902": {
     "departamento": "Quetzaltenango",
     "eventos": [
