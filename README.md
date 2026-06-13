@@ -18,7 +18,7 @@ El software opera en **dos modalidades**:
 | **OE1** — Rendimiento y accesibilidad móvil | `src/audits/performance.py` | TTFB, tiempo de carga, peso de página, viewport móvil, lang, alt en imágenes |
 | **OE2** — Frecuencia de actualización y transparencia | `src/audits/content_freshness.py` | Snapshots Wayback 2021–2026, intervalo entre actualizaciones, secciones LAIP |
 | **OE3** — Vulnerabilidades de seguridad básica | `src/audits/security.py` | Estado SSL (válido/autofirmado/hostname_mismatch/inválido), TLS, headers HSTS/CSP/X-Frame-Options, forzado de HTTPS |
-| **OE4** — Asociaciones estadísticas (datos categóricos) | `src/analysis/stats.py` (`analisis_oe4_completo`) | χ² de independencia, prueba exacta de Fisher / Monte Carlo, V de Cramér, regresión logística binaria de `cumple_LAIP` y `tiene_vulnerabilidad` |
+| **OE4** — Asociaciones estadísticas (datos categóricos) | `src/analysis/stats.py` (`analisis_oe4_completo`) | χ² de independencia, prueba exacta de Fisher / Monte Carlo, V de Cramér sobre `nivel_laip` (Pleno/Limitado/No_cumple); regresión logística binaria de `cumple_mayoria_LAIP` y `tiene_vulnerabilidad` |
 
 ## Instalación
 
@@ -33,10 +33,21 @@ Variables de entorno opcionales (archivo `.env`):
 
 ```
 PAGESPEED_API_KEY=tu_api_key_de_google_pagespeed_insights
-USER_AGENT=EgovAuditBot/1.0 (investigacion-academica)
+USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) ... Chrome/126.0.0.0 Safari/537.36
 ```
 
 La API key de PageSpeed es **opcional** y gratuita: https://developers.google.com/speed/docs/insights/v5/get-started
+
+> **User-Agent:** por defecto se usa el de un navegador real (Chrome) junto con cabeceras de navegación estándar (`Accept`, `Accept-Language`, `Sec-Fetch-*`). Muchos WAF devuelven 403 a clientes que no las envían; replicar lo que manda un visitante normal **no cambia lo que el sitio sirve**, solo evita falsos bloqueos. No se usan proxies ni se resuelven captchas.
+
+Para el 2º intento del mantenimiento de URLs (ver más abajo) se usa un navegador headless **opcional**:
+
+```bash
+pip install playwright       # ya está en requirements.txt
+playwright install chromium  # descarga el navegador (~150 MB), una sola vez
+```
+
+Si Playwright no está instalado, el sistema sigue funcionando: simplemente omite el 2º intento.
 
 ## Uso
 
@@ -50,11 +61,20 @@ python main.py --all --solo security  # solo una dimensión
 python main.py --reporte              # regenerar Excel + dashboard desde resultados.csv
 ```
 
-Descubrimiento de URLs faltantes:
+Descubrimiento y mantenimiento del catálogo de URLs:
 
 ```bash
-python main.py --descubrir                 # Suroccidente → descubrimiento_urls.csv
+python main.py --descubrir                 # solo informe (no escribe): busca URLs faltantes
+python main.py --descubrir --escribir      # mantenimiento: verifica/reemplaza/descubre y escribe el catálogo
 ```
+
+Con `--escribir` el sistema, para cada municipio (ver [El catálogo de URLs](#el-catálogo-de-urls)):
+
+- prueba la URL oficial vigente; si responde la conserva;
+- si devuelve **403/401/429** la marca *restringida* (el sitio existe, bloquea al bot) — **no** es caída ni motivo de reemplazo;
+- si parece **muerta**, hace un **2º intento con un navegador real** (Playwright headless) antes de contar el fallo, para descartar challenges JS / anti-bot;
+- solo tras **2 fallos confirmados seguidos** busca reemplazo con el descubridor;
+- los resultados se escriben en `config/urls_overrides.json` (catálogo fusionable) y `config/url_registro.json` (historial). **Nunca** modifica `municipios.yaml` ni borra URLs caídas (la caída es dato de uptime).
 
 ### Modalidad B — Estudio longitudinal (la de la tesis)
 
@@ -81,6 +101,16 @@ streamlit run src/reports/streamlit_app.py
 
 **4) Recolección automática en la nube:** ver [`DEPLOY_ACTIONS.md`](DEPLOY_ACTIONS.md) (guía local, no versionada) para configurar los dos workflows de GitHub Actions que dejan corriendo la recolección a días/horas aleatorios.
 
+## El catálogo de URLs
+
+El catálogo curado vive en `config/municipios.yaml` y **no se edita automáticamente**. Las variaciones se gestionan con tres archivos JSON fusionados en la carga:
+
+- **`config/urls_overrides.json`** — reemplazos y descubrimientos que el mantenimiento (`--descubrir --escribir`) escribe sin tocar el YAML. Cada entrada lleva `url`, `tipo_portal`, `fuente` (`reemplazo` | `descubrimiento`), `fecha` y, si aplica, `url_anterior`. Para corregir un caso a mano basta con copiar un objeto aquí.
+- **`config/url_registro.json`** — historial por municipio: `fallos_consecutivos`, `ultima_verificacion` y la lista de `eventos` (verificada_ok, reactivada, restringido, reemplazada, descubierta, caida). Es la base del *uptime* del catálogo.
+- **`config/urls_excluidas.json`** — **lista de veto editable**: sitios validados manualmente como falsos positivos o fraudulentos que el descubridor debe **omitir siempre** (p. ej. clones no oficiales). El descubrimiento también descarta por origen los dominios no oficiales conocidos (portales `laip.gt`, `iap.gob.gt`), que son de transparencia y no la web institucional.
+
+Lógica de verificación (con `--escribir`): `vivo` (2xx/3xx) → se conserva · `restringido` (403/401/429) → existe, se mantiene, no cuenta como fallo · `muerto` → **2º intento con navegador** (Playwright); solo si también falla cuenta como fallo, y solo tras **2 fallos seguidos** se busca reemplazo. Las URLs caídas nunca se borran: se registran y se vuelven a probar.
+
 ## Salidas
 
 En `data/reports/`:
@@ -98,7 +128,8 @@ En `data/reports/`:
 - Continuas (mediana + desviación, solo corridas exitosas): `ttfb_mediana`, `tiempo_total_mediana`, `tamanio_kb_mediana`.
 - Modales (solo exitosas): `ssl_estado_modal`, `header_*_modal`, `viewport_modal`, `laip_*_modal`.
 - **Variables dependientes:**
-  - `cumple_LAIP` = 1 si están presentes **todos** los apartados obligatorios del Decreto 57-2008; 0 si falta al menos uno.
+  - `nivel_laip` (ordinal, 3 niveles): **Pleno** = los 7 apartados del Decreto 57-2008 presentes; **Limitado** = mayoría presente (≥4); **No_cumple** = menos de 4. Se usa así porque el `cumple_LAIP` estricto (todos los 7) resultaba degenerado (todos en 0) y no admitía inferencia.
+  - `cumple_mayoria_LAIP` = 1 si `nivel_laip` ∈ {Pleno, Limitado} (≥4 apartados); 0 si No_cumple. Es la versión binaria que entra en la regresión logística.
   - `tiene_vulnerabilidad` = 1 si: SSL inválido/autofirmado/hostname_mismatch, **o** sin redirección HTTPS, **o** ausencia simultánea de HSTS + X-Frame-Options + CSP.
 - **Predictores:** `departamento`, `cabecera`, `tipo_hosting` (heurístico por dominio), `calidad_tecnica`.
 
@@ -109,14 +140,17 @@ En `data/reports/`:
 ```
 egov-audit/
 ├── config/
-│   ├── municipios.yaml          # Suroccidente curado (111 munis, 39 con portal)
+│   ├── municipios.yaml          # Suroccidente curado (111 munis, 39 con portal) — NO se edita auto
+│   ├── urls_overrides.json      # reemplazos/descubrimientos fusionados en la carga
+│   ├── url_registro.json        # historial y uptime del catálogo (eventos por municipio)
+│   ├── urls_excluidas.json      # lista de veto editable (falsos positivos / fraudulentos)
 │   └── settings.py
 ├── src/
-│   ├── portales.py              # Carga/expansión de portales (compartido)
-│   ├── scraper/                 # fetcher, discoverer
+│   ├── portales.py              # Carga/expansión de portales + fusión de overrides
+│   ├── scraper/                 # fetcher (headers de navegador), discoverer, navegador (Playwright), url_updater
 │   ├── audits/                  # performance (OE1), content_freshness (OE2), security (OE3)
 │   ├── collect/                 # RECOLECCIÓN: store (JSONL+SQLite) + daily_run
-│   ├── consolidate/             # CONSOLIDACIÓN: snapshots → 1 fila/portal + dependientes
+│   ├── consolidate/             # CONSOLIDACIÓN: snapshots → 1 fila/municipio (codigo_ine) + nivel_laip
 │   ├── schedule/                # planner aleatorio + gate (GitHub Actions)
 │   ├── analysis/                # stats: descriptiva, inferencial y OE4 categórico
 │   └── reports/                 # generator (Excel), dashboard (HTML), streamlit_app
@@ -124,26 +158,28 @@ egov-audit/
 │   ├── daily/                   # snapshots JSONL (versionado)
 │   ├── consolidated/            # tabla final (derivado)
 │   └── reports/                 # Excel / HTML / PNG
-├── .github/workflows/           # planner.yml + runner.yml
+├── .github/workflows/           # planner.yml + runner.yml + actualizar-urls.yml
 ├── main.py                      # auditoría puntual / descubrimiento / reportes
 ├── run_daily.py                 # una corrida de recolección (lo llama Actions)
 └── analizar.py                  # consolida + reportes del estudio longitudinal
 ```
 
+Los tres workflows se disparan vía **cron-job.org** (`workflow_dispatch`), no con el `schedule` nativo de GitHub (poco fiable): `planner.yml` sortea las corridas, `runner.yml` recolecta, y `actualizar-urls.yml` mantiene el catálogo semanalmente (instala Chromium para el 2º intento). Detalles en [`DEPLOY_ACTIONS.md`](DEPLOY_ACTIONS.md).
+
 ## Metodología
 
-1. **Recolección:** cada portal se visita una vez por corrida, con User-Agent identificado y timeouts. La modalidad longitudinal repite la corrida a horas y días aleatorios para descorrelacionar el sesgo por hora del día y por día de la semana.
+1. **Recolección:** cada portal se visita una vez por corrida, con un User-Agent y cabeceras de un navegador real (para que los WAF no devuelvan 403 a un visitante legítimo) y timeouts. La modalidad longitudinal repite la corrida a horas y días aleatorios para descorrelacionar el sesgo por hora del día y por día de la semana.
 2. **Rendimiento (OE1):** TTFB, tiempo total, peso, viewport móvil, `lang`, `alt`.
 3. **Frescura y transparencia (OE2):** snapshots de Wayback (2021–2026) y presencia de los apartados de los artículos 10–11 del Decreto 57-2008.
 4. **Seguridad (OE3):** validación de la cadena SSL con clasificación única (`ssl_estado`), versión TLS, headers OWASP y forzado de HTTPS.
-5. **Consolidación (anti-pseudoreplicación):** las mediciones repetidas se reducen a **un registro por portal** (mediana/moda + uptime) **antes** de cualquier inferencia. Tratar las corridas repetidas como observaciones independientes sería pseudoreplicación; el análisis siempre consume la tabla consolidada.
+5. **Consolidación (anti-pseudoreplicación):** las mediciones repetidas se reducen a **un registro por municipio** (agrupando por `codigo_ine`, mediana/moda + uptime) **antes** de cualquier inferencia. Si un municipio cambió de URL, sus registros se tratan como uno solo. Tratar las corridas repetidas como observaciones independientes sería pseudoreplicación; el análisis siempre consume la tabla consolidada.
 6. **Análisis descriptivo e inferencial:** medias, medianas, IQR, IC95 (Wilson para proporciones, t-Student para medias), Kruskal-Wallis entre departamentos, correlaciones Spearman.
-7. **Análisis de datos categóricos (OE4):** χ² de independencia; prueba exacta de Fisher (2×2) o χ² Monte Carlo (R×C) cuando hay frecuencias esperadas <5; V de Cramér para la magnitud; y regresión logística binaria (`statsmodels`) de `cumple_LAIP` y `tiene_vulnerabilidad` con coeficientes, odds ratios, IC95, AIC, BIC y pseudo-R² de McFadden.
+7. **Análisis de datos categóricos (OE4):** χ² de independencia sobre `nivel_laip` (Pleno/Limitado/No_cumple); prueba exacta de Fisher (2×2) o χ² Monte Carlo (R×C) cuando hay frecuencias esperadas <5; V de Cramér para la magnitud; y regresión logística binaria (`statsmodels`) de `cumple_mayoria_LAIP` y `tiene_vulnerabilidad` con coeficientes, odds ratios, IC95, AIC, BIC y pseudo-R² de McFadden.
 
 ## Consideraciones éticas
 
 - Solo se accede a información pública mediante peticiones HTTP estándar (sin bypass de autenticación ni envío de formularios).
-- Se respeta `robots.txt` cuando está presente y se usa un User-Agent identificado.
+- Se usa un User-Agent y cabeceras de un navegador real para que el sitio responda como lo haría a un visitante normal; el 2º intento con navegador headless solo **carga** la página (no resuelve captchas, no usa proxies, no fuerza nada). El objetivo es distinguir una caída real de un bloqueo anti-bot, no evadir controles.
 - Una sola visita por portal por corrida (no DoS); la recolección se distribuye en el tiempo.
 - Los datos recogidos son técnicos y públicos; no se procesan datos personales.
 
