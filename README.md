@@ -166,7 +166,7 @@ egov-audit/
 └── analizar.py                  # consolida + reportes del estudio longitudinal
 ```
 
-Los tres workflows se disparan vía **cron-job.org** (`workflow_dispatch`), no con el `schedule` nativo de GitHub (poco fiable): `planner.yml` sortea las corridas, `runner.yml` recolecta, y `actualizar-urls.yml` mantiene el catálogo semanalmente. Tanto `runner.yml` como `actualizar-urls.yml` instalan Chromium para el 2º intento con navegador. Detalles en [`DEPLOY_ACTIONS.md`](DEPLOY_ACTIONS.md).
+Los tres workflows se disparan vía **cron-job.org** (`workflow_dispatch`), no con el `schedule` nativo de GitHub (poco fiable): `planner.yml` sortea las corridas de la semana **en curso** (ventana domingo→sábado, con el propio domingo como día 1; entre 3 y 7 días al azar × 7 corridas/día a horas aleatorias), `runner.yml` recolecta, y `actualizar-urls.yml` mantiene el catálogo semanalmente. Tanto `runner.yml` como `actualizar-urls.yml` instalan Chromium para el 2º intento con navegador. Detalles en [`DEPLOY_ACTIONS.md`](DEPLOY_ACTIONS.md).
 
 ## Metodología
 
