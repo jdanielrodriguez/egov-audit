@@ -66,12 +66,12 @@ def main() -> int:
     df_rep = a_formato_reporte(consol)
     try:
         xlsx = generar_reporte(df_rep, sufijo="_consolidado")
-        log.info("✅ Excel: %s", xlsx)
+        log.info("[OK] Excel: %s", xlsx)
     except Exception as ex:
         log.exception("Error generando Excel: %s", ex)
     try:
         dash = generar_dashboard(df_rep)
-        log.info("✅ Dashboard: %s", dash)
+        log.info("[OK] Dashboard: %s", dash)
     except Exception as ex:
         log.exception("Error generando dashboard: %s", ex)
 
