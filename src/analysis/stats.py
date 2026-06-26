@@ -14,6 +14,7 @@ Todo retorna pandas DataFrames listos para exportar.
 """
 from __future__ import annotations
 
+import warnings
 from typing import Dict, Any, Iterable, Optional, List, Tuple
 
 import numpy as np
@@ -432,14 +433,33 @@ def regresion_logistica_binaria(
         return None, {"error": "ningún predictor con variabilidad suficiente"}
 
     formula = "y_bin ~ " + " + ".join(f"C(Q('{p}'))" for p in preds_validos)
+    # Con muestras chicas y categorías desbalanceadas es habitual la SEPARACIÓN
+    # (cuasi)perfecta: la MLE diverge y statsmodels emite ConvergenceWarning. No es
+    # un error del software; lo registramos en `convergio` y abajo se anula el OR.
+    # Silenciamos el ruido SOLO en este bloque controlado (no globalmente).
     try:
-        modelo = _sm_logit(formula, data=sub).fit(disp=False, maxiter=200)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            modelo = _sm_logit(formula, data=sub).fit(disp=False, maxiter=200)
     except Exception as ex:
         return None, {"error": f"ajuste fallido: {ex}"}
 
     coefs, se, z, p = modelo.params, modelo.bse, modelo.tvalues, modelo.pvalues
     ic = modelo.conf_int(alpha=0.05)
     ic.columns = ["lo", "hi"]
+    convergio = bool(modelo.mle_retvals.get("converged", False))
+
+    # exp() de un coeficiente que divergió desborda a inf: lo evitamos y dejamos
+    # NaN en vez de un OR absurdo (inf / 0 por separación) para no engañar al lector.
+    with np.errstate(over="ignore", invalid="ignore"):
+        or_pe = np.exp(coefs.values)
+        or_lo = np.exp(ic["lo"].values)
+        or_hi = np.exp(ic["hi"].values)
+
+    def _finito(arr):
+        a = np.asarray(arr, dtype=float)
+        a[~np.isfinite(a)] = np.nan
+        return a.round(4)
 
     tabla = pd.DataFrame({
         "termino": coefs.index,
@@ -447,9 +467,9 @@ def regresion_logistica_binaria(
         "std_err": se.values.round(4),
         "z": z.values.round(4),
         "p_valor": p.values.round(6),
-        "OR": np.exp(coefs.values).round(4),
-        "IC95_OR_low": np.exp(ic["lo"].values).round(4),
-        "IC95_OR_high": np.exp(ic["hi"].values).round(4),
+        "OR": _finito(or_pe),
+        "IC95_OR_low": _finito(or_lo),
+        "IC95_OR_high": _finito(or_hi),
         "significativo_alfa005": (p.values < 0.05),
     })
 
@@ -465,10 +485,16 @@ def regresion_logistica_binaria(
         "aic": round(float(modelo.aic), 3),
         "bic": round(float(modelo.bic), 3),
         "p_LR_modelo": round(float(modelo.llr_pvalue), 6),
-        "convergio": bool(modelo.mle_retvals.get("converged", False)),
+        "convergio": convergio,
         "formula": formula,
         "nivel_positivo": nivel_positivo,
     }
+    if not convergio:
+        metricas["nota"] = (
+            "El modelo NO convergio (separacion cuasi-perfecta por muestra pequena / "
+            "categorias desbalanceadas). Los OR e IC son poco fiables; usar "
+            "chi-cuadrado/Fisher/V de Cramer para la inferencia y reevaluar con mas datos."
+        )
     return tabla, metricas
 
 
