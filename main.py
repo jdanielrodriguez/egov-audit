@@ -1,22 +1,31 @@
 """
-Punto de entrada: orquesta todo el flujo de auditoría.
+Punto de entrada de la auditoría PUNTUAL (una foto ad-hoc de los portales).
 
-v2 (mayo 2026):
-- Soporte para múltiples URLs por municipio (campo `urls:` además de `url:`)
-- Filtros por tipo de portal (oficial, transparencia_iap, alternativa)
-- Auditoría también de instituciones gubernamentales no municipales
+Para el estudio longitudinal de la tesis se usan `run_daily.py` (recolección) y
+`analizar.py` (consolidación + reportes); ver el README.
 
-Uso:
-    python main.py --all
-    python main.py --url https://www.muniquetzaltenango.gob.gt
-    python main.py --departamento Quetzaltenango
-    python main.py --all --solo performance
-    python main.py --all --no-pagespeed --no-wayback
-    python main.py --reporte
-    python main.py --descubrir
-    python main.py --descubrir-iap            # busca portales de transparencia IAP
-    python main.py --tipo-portal oficial      # filtrar por tipo
-    python main.py --instituciones            # auditar entidades gubernamentales no municipales
+Comandos, agrupados por propósito:
+
+  # 1) DESCUBRIR / mantener el catálogo de URLs
+  python main.py --descubrir                 # informe: busca URLs de municipios sin URL
+  python main.py --descubrir --escribir      # mantenimiento: verifica/reemplaza/descubre y escribe el catálogo
+  python main.py --descubrir-iap             # además busca portales de transparencia IAP
+
+  # 2) AUDITAR (rendimiento OE1, transparencia OE2, seguridad OE3)
+  python main.py --all                       # todos los portales del Suroccidente
+  python main.py --url https://...           # una sola URL ad-hoc
+  python main.py --departamento Quetzaltenango
+  python main.py --tipo-portal oficial       # filtra por tipo de portal
+  python main.py --all --solo security       # solo una dimensión (performance|freshness|security)
+  python main.py --all --no-pagespeed --no-wayback   # auditoría sin servicios externos
+  python main.py --instituciones             # incluir entidades gubernamentales no municipales
+  # (--all/--url/--departamento generan automáticamente el Excel y el dashboard al final)
+
+  # 3) GENERAR REPORTE Excel (desde data/processed/resultados.csv)
+  python main.py --reporte
+
+  # 4) GENERAR DASHBOARD HTML (desde data/processed/resultados.csv)
+  python main.py --dashboard
 """
 
 from __future__ import annotations
@@ -248,7 +257,12 @@ def main() -> int:
     parser.add_argument(
         "--reporte",
         action="store_true",
-        help="Solo regenera el reporte desde resultados.csv",
+        help="Solo regenera el reporte Excel desde resultados.csv",
+    )
+    parser.add_argument(
+        "--dashboard",
+        action="store_true",
+        help="Solo regenera el dashboard HTML desde resultados.csv",
     )
     parser.add_argument(
         "--descubrir",
@@ -300,17 +314,27 @@ def main() -> int:
             ejecutar_descubrimiento(municipios, incluir_iap=args.descubrir_iap)
         return 0
 
-    # Modo regenerar reporte (no audita)
-    if args.reporte:
+    # Modo regenerar reporte/dashboard desde resultados.csv (no audita).
+    # --reporte = solo Excel; --dashboard = solo HTML; ambas flags = ambos.
+    if args.reporte or args.dashboard:
         csv_path = PROCESSED_DIR / "resultados.csv"
         if not csv_path.exists():
             log.error("No existe %s. Corra primero la auditoría.", csv_path)
             return 1
-        df = pd.read_csv(csv_path)
-        out = generar_reporte(df)
-        log.info("Reporte regenerado: %s", out)
-        dash = generar_dashboard(df)
-        log.info("Dashboard regenerado: %s", dash)
+        try:
+            df = pd.read_csv(csv_path)
+        except pd.errors.EmptyDataError:
+            log.error("%s está vacío. Corra primero una auditoría (p. ej. python main.py --all).", csv_path)
+            return 1
+        if df.empty:
+            log.error("%s no tiene filas. Corra primero una auditoría.", csv_path)
+            return 1
+        if args.reporte:
+            out = generar_reporte(df)
+            log.info("[OK] Reporte Excel regenerado: %s", out)
+        if args.dashboard:
+            dash = generar_dashboard(df)
+            log.info("[OK] Dashboard regenerado: %s", dash)
         return 0
 
     # Validar que se especificó qué auditar
@@ -385,7 +409,7 @@ def main() -> int:
     # Reporte Excel
     try:
         xlsx = generar_reporte(df)
-        log.info("✅ Reporte Excel: %s", xlsx)
+        log.info("[OK] Reporte Excel: %s", xlsx)
     except Exception as ex:
         log.exception("Error generando reporte: %s", ex)
         return 2
@@ -393,7 +417,7 @@ def main() -> int:
     # Dashboard HTML
     try:
         dash = generar_dashboard(df)
-        log.info("✅ Dashboard HTML: %s", dash)
+        log.info("[OK] Dashboard HTML: %s", dash)
     except Exception as ex:
         log.exception("Error generando dashboard: %s", ex)
 

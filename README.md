@@ -51,24 +51,45 @@ Si Playwright no está instalado, el sistema sigue funcionando: simplemente omit
 
 ## Uso
 
-### Modalidad A — Auditoría puntual
+### Modalidad A — Auditoría puntual (`main.py`)
+
+Los comandos de `main.py` se agrupan en cuatro propósitos:
+
+**1) Descubrir / mantener el catálogo de URLs**
 
 ```bash
-python main.py --all                  # todos los portales del Suroccidente
-python main.py --url https://...      # una sola URL ad-hoc
-python main.py --departamento Sololá  # un departamento
-python main.py --all --solo security  # solo una dimensión
-python main.py --reporte              # regenerar Excel + dashboard desde resultados.csv
-```
-
-Descubrimiento y mantenimiento del catálogo de URLs:
-
-```bash
-python main.py --descubrir                 # solo informe (no escribe): busca URLs faltantes
+python main.py --descubrir                 # informe (no escribe): busca URLs de municipios sin URL
 python main.py --descubrir --escribir      # mantenimiento: verifica/reemplaza/descubre y escribe el catálogo
+python main.py --descubrir-iap             # además busca portales de transparencia IAP
 ```
 
-Con `--escribir` el sistema, para cada municipio (ver [El catálogo de URLs](#el-catálogo-de-urls)):
+**2) Auditar** (rendimiento OE1, transparencia OE2, seguridad OE3)
+
+```bash
+python main.py --all                       # todos los portales del Suroccidente
+python main.py --url https://...           # una sola URL ad-hoc
+python main.py --departamento Sololá       # un departamento
+python main.py --tipo-portal oficial       # filtra por tipo de portal
+python main.py --all --solo security       # solo una dimensión (performance|freshness|security)
+python main.py --all --no-pagespeed --no-wayback   # sin servicios externos
+python main.py --instituciones             # incluir entidades gubernamentales no municipales
+```
+
+> Un comando de auditoría (`--all`/`--url`/`--departamento`) genera **automáticamente** el Excel y el dashboard al terminar.
+
+**3) Generar reporte Excel** (desde `data/processed/resultados.csv`)
+
+```bash
+python main.py --reporte
+```
+
+**4) Generar dashboard HTML** (desde `data/processed/resultados.csv`)
+
+```bash
+python main.py --dashboard
+```
+
+Detalle del mantenimiento del catálogo (`--descubrir --escribir`), para cada municipio (ver [El catálogo de URLs](#el-catálogo-de-urls)):
 
 - prueba la URL oficial vigente; si responde la conserva;
 - si devuelve **403/401/429** la marca *restringida* (el sitio existe, bloquea al bot) — **no** es caída ni motivo de reemplazo;
@@ -99,7 +120,7 @@ python analizar.py --wayback         # además frescura histórica (consulta Way
 streamlit run src/reports/streamlit_app.py
 ```
 
-**4) Recolección automática en la nube:** ver [`DEPLOY_ACTIONS.md`](DEPLOY_ACTIONS.md) (guía local, no versionada) para configurar los dos workflows de GitHub Actions que dejan corriendo la recolección a días/horas aleatorios.
+**4) Recolección automática en la nube:** ver [`DEPLOY_ACTIONS.md`](DEPLOY_ACTIONS.md) (guía local, no versionada) para configurar los tres workflows de GitHub Actions (`planner`, `runner`, `actualizar-urls`) que dejan corriendo la recolección a días/horas aleatorios.
 
 ## El catálogo de URLs
 
@@ -176,7 +197,7 @@ Los tres workflows se disparan vía **cron-job.org** (`workflow_dispatch`), no c
 4. **Seguridad (OE3):** validación de la cadena SSL con clasificación única (`ssl_estado`), versión TLS, headers OWASP y forzado de HTTPS.
 5. **Consolidación (anti-pseudoreplicación):** las mediciones repetidas se reducen a **un registro por municipio** (agrupando por `codigo_ine`, mediana/moda + uptime) **antes** de cualquier inferencia. Si un municipio cambió de URL, sus registros se tratan como uno solo. Tratar las corridas repetidas como observaciones independientes sería pseudoreplicación; el análisis siempre consume la tabla consolidada.
 6. **Análisis descriptivo e inferencial:** medias, medianas, IQR, IC95 (Wilson para proporciones, t-Student para medias), Kruskal-Wallis entre departamentos, correlaciones Spearman.
-7. **Análisis de datos categóricos (OE4):** χ² de independencia sobre `nivel_laip` (Pleno/Limitado/No_cumple); prueba exacta de Fisher (2×2) o χ² Monte Carlo (R×C) cuando hay frecuencias esperadas <5; V de Cramér para la magnitud; y regresión logística binaria (`statsmodels`) de `cumple_mayoria_LAIP` y `tiene_vulnerabilidad` con coeficientes, odds ratios, IC95, AIC, BIC y pseudo-R² de McFadden.
+7. **Análisis de datos categóricos (OE4):** χ² de independencia sobre `nivel_laip` (Pleno/Limitado/No_cumple); prueba exacta de Fisher (2×2) o χ² Monte Carlo (R×C) cuando hay frecuencias esperadas <5; V de Cramér para la magnitud; y regresión logística binaria (`statsmodels`) de `cumple_mayoria_LAIP` y `tiene_vulnerabilidad` con coeficientes, odds ratios, IC95, AIC, BIC y pseudo-R² de McFadden. Con muestras pequeñas/desbalanceadas la logística puede sufrir **separación cuasi-perfecta** (no converge): en ese caso se marca `convergio=False`, los OR/IC no finitos se reportan como `NaN` (no `inf`) y se agrega una nota remitiendo a χ²/Fisher/Cramér; la inferencia válida recae en esas pruebas.
 
 ## Consideraciones éticas
 
