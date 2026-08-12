@@ -203,7 +203,8 @@ Los tres workflows se disparan vía **cron-job.org** (`workflow_dispatch`), no c
 
 - Solo se accede a información pública mediante peticiones HTTP estándar (sin bypass de autenticación ni envío de formularios).
 - Se usa un User-Agent y cabeceras de un navegador real para que el sitio responda como lo haría a un visitante normal; el 2º intento con navegador headless solo **carga** la página (no resuelve captchas, no usa proxies, no fuerza nada). El objetivo es distinguir una caída real de un bloqueo anti-bot, no evadir controles.
-- Una sola visita por portal por corrida (no DoS); la recolección se distribuye en el tiempo.
+- Cada corrida hace **unas pocas** peticiones por portal (la visita principal, la comprobación de redirección HTTP→HTTPS y el handshake TLS), de forma deliberada para verificar rendimiento y seguridad; no hay crawling ni DoS, y la recolección se distribuye en días y horas aleatorios.
+- No se parsea `robots.txt`: no se hace rastreo de rutas, solo se carga la página pública de inicio de cada portal (acceso equivalente al de un visitante).
 - Los datos recogidos son técnicos y públicos; no se procesan datos personales.
 
 ## Autor
