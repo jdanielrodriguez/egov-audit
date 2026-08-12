@@ -293,7 +293,10 @@ def _resumen_ejecutivo(df: pd.DataFrame) -> pd.DataFrame:
     def pct_true(col):
         if col not in df.columns:
             return None
-        return round(df[col].fillna(False).astype(bool).mean() * 100, 2)
+        # dropna: excluye del denominador los portales sin dato HTTP (no
+        # auditables), para no contarlos como False y sesgar el porcentaje.
+        s = df[col].dropna()
+        return round(s.astype(bool).mean() * 100, 2) if len(s) else None
 
     def media(col):
         if col not in df.columns:

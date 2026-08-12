@@ -87,13 +87,16 @@ def proporciones(df: pd.DataFrame, columnas_bool: Iterable[str]) -> pd.DataFrame
     for col in columnas_bool:
         if col not in df.columns:
             continue
-        s = df[col]
-        # Convertir a booleano numpy
-        s_bool = s.fillna(False).astype(bool)
-        n = len(s_bool)
-        k = int(s_bool.sum())
+        # Se EXCLUYEN los valores nulos del denominador: un NaN aquí significa
+        # "sin dato" (portal no auditable por HTTP, p. ej. bloqueo 403 permanente),
+        # no "no cumple". Contarlos como False sesgaría las proporciones (sobre todo
+        # de seguridad). Coherente con el tratamiento de nivel_laip.
+        s = df[col].dropna()
+        n = len(s)
         if n == 0:
             continue
+        s_bool = s.astype(bool)
+        k = int(s_bool.sum())
         p = k / n
         # IC Wilson
         low, high = _wilson(k, n)

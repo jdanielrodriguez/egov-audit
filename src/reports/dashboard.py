@@ -80,8 +80,10 @@ def _calcular_kpis(df: pd.DataFrame) -> Dict[str, Any]:
     def pct(col):
         if col not in df.columns:
             return None
-        s = df[col].fillna(False).astype(bool)
-        return round(s.mean() * 100, 1) if len(s) else None
+        # dropna: los portales sin dato HTTP (no auditables) NO entran al
+        # denominador; contarlos como False sesgaría el %.
+        s = df[col].dropna()
+        return round(s.astype(bool).mean() * 100, 1) if len(s) else None
 
     def pct_nivel_laip(niveles):
         """% de portales (evaluables) cuyo nivel_laip está en `niveles`."""
@@ -408,7 +410,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 
 <footer>
   Datos generados por <strong>egov-audit</strong> · Python (pandas, scipy, statsmodels) y Chart.js<br>
-  Auditoría académica — Respeta robots.txt y solo accede a contenido público.
+  Auditoría académica — Accede solo a contenido público, sin autenticación ni crawling; pocas peticiones por portal en cada corrida (no DoS).
 </footer>
 
 <script>
