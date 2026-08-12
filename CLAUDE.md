@@ -52,6 +52,12 @@ medición individual (ver §10, anti-pseudoreplicación).
 9. Se **corrigió el planificador** para que la ventana sea **domingo→sábado** (antes
    planificaba lunes→domingo siguiente y desperdiciaba slots).
 10. Se hizo robusta la **logística del OE4** ante separación cuasi-perfecta.
+11. Se implementó la **selección de 2–3 predictores por significancia bivariada** en la
+    logística (con guarda de convergencia/estabilidad); ahora converge.
+12. Se **arregló la prueba de permutación/Monte Carlo** de χ² (la API de scipy cambió) y
+    se **excluyó `calidad_tecnica`** como predictor (circular/inflada).
+13. Se corrigieron proporciones OE3 (denominador = evaluables), el fallback SSL del
+    fetcher y se **integró la frescura Wayback (OE2)** de todo el portal (`--wayback`).
 
 ---
 
@@ -231,9 +237,14 @@ Flujo longitudinal (la tesis):
 
 ```bash
 python analizar.py                   # consolida → Excel (OE1–OE4) + dashboard HTML
-python analizar.py --wayback         # además frescura histórica (consulta Wayback, red)
+python analizar.py --wayback         # además frescura histórica OE2 (Wayback, red; ~1 min)
 streamlit run src/reports/streamlit_app.py   # dashboard interactivo (opcional)
 ```
+
+> **OE2 frescura (Wayback):** solo se calcula con `--wayback` (consulta la CDX API
+> del Internet Archive, `matchType=prefix` = todo el portal, no solo la home). Añade
+> `dias_desde_ultima_actualizacion`, `snapshots_unicos`, etc. al consolidado. El Excel
+> muestra mediana + P25/P75 de "días desde última actualización".
 
 Flujo puntual (desde `data/processed/resultados.csv`):
 
@@ -245,10 +256,18 @@ python main.py --dashboard           # solo dashboard HTML
 - **Siempre se analiza la tabla consolidada** (1 fila/municipio), nunca los snapshots
   crudos (anti-pseudoreplicación, §10).
 - **OE4** (`analisis_oe4_completo`): χ²/Fisher/V de Cramér **son la inferencia válida**.
-  La **regresión logística** puede **no converger** por separación cuasi-perfecta
-  (muestra pequeña / categorías desbalanceadas): en ese caso `convergio=False`, los
-  OR/IC no finitos se reportan como `NaN` (no `inf`) y hay una `nota`. No confiar en la
-  logística mientras no converja; apoyarse en χ²/Fisher/Cramér.
+  - Predictores **confiables**: `departamento`, `cabecera`, `tipo_hosting`.
+    `calidad_tecnica` se **excluye** como predictor (deriva de un score interno inflado
+    que comparte información con las respuestas → asociaciones circulares; **pendiente
+    redefinir**, §12).
+  - Tablas RxC con celdas escasas → **prueba de permutación/Monte Carlo**
+    (`PermutationMethod` de scipy ≥1.9 con `correction=False`; el string `"monte-carlo"`
+    NO era válido y caía al χ² asintótico). Fisher para 2×2.
+  - **Regresión logística**: `regresion_logistica_seleccionada` elige 2–3 predictores por
+    significancia bivariada (selección hacia adelante con guarda de **convergencia +
+    estabilidad** `_modelo_estable`, que descarta separación que el flag `converged` no
+    capta). Si nada converge, `convergio=False`, OR/IC `NaN` (no `inf`) y `nota`. Con los
+    datos actuales converge (selecciona `cabecera`), sin significancia.
 
 ---
 
@@ -266,41 +285,59 @@ python main.py --dashboard           # solo dashboard HTML
   navegador) pero **sin métricas** → su `nivel_laip` queda **`None`** (NO se marca
   falsamente como `No_cumple`).
 - **403/401/429 = restringido, no caída.** Evita falsos positivos de sitios con WAF.
-- **OE4 logística:** manejo explícito de la no-convergencia (ver §9).
+- **Proporciones OE1/OE3 sobre los evaluables:** las tasas (SSL, headers, viewport…)
+  usan denominador **35** (excluyen `dropna` los 3 sin dato HTTP); contarlos como False
+  sesgaba los %. Coherente con el trato de `nivel_laip`.
+- **OE4:** selección de 2–3 predictores por significancia bivariada + guarda de
+  convergencia/estabilidad; permutación/Monte Carlo en RxC escasas; `calidad_tecnica`
+  excluida por circularidad (ver §9, §12).
 
 ---
 
 ## 11. Hallazgos actuales (instantánea — regenerar con `analizar.py`)
 
-> Al **2026-06-27**: 2808 snapshots, 72 corridas, 39 portales, 11 días.
+> Corte parcial al **2026-08-11**: **11 505 mediciones, 295 corridas, 39 portales,
+> 43 días** (10 jun–11 ago). Base analítica: **38 municipios** (39 portales; Cajolá
+> tiene 2 URLs → 1 registro); **35 auditables por HTTP**. Estimadores **ya estables**
+> (al duplicar la data casi no se movieron). **Preliminar**: recolección en curso.
 
-- **Disponibilidad** alta (uptime medio ~95%, mediana 100%). Caídas reales:
-  **Cajolá** (TLS roto), **El Asintal** (404 + SSL), **Pajapita** (500). Tres sitios
-  bloquean al bot el 100% del tiempo (**Quetzaltenango/Xela, Salcajá, San José
-  Ojetenam**): vivos por navegador pero **no auditables por HTTP**.
-- **OE1:** sitios livianos y rápidos, pero **solo ~37% tiene viewport móvil** → la
-  brecha es de **accesibilidad móvil**, no de velocidad.
-- **OE2:** **ningún municipio cumple los 7 apartados LAIP**; mediana de cumplimiento
-  0%. Lo más sensible (compras/contrataciones 3%, presupuesto 9%, personal 9%) es lo
-  más ausente. **Es el hallazgo central.**
-- **OE3:** cifrado moderno y correcto (SSL válido, TLS 1.2/1.3), pero **~77%
-  vulnerables** por **headers de configuración** (X-Frame-Options 0%, HSTS 9%, CSP
-  20%, solo 65% fuerza HTTPS).
+- **Disponibilidad** alta: uptime **medio 96.8%, mediana 99.5%**. Uptime bajo real:
+  **Cajolá (~51%)**. Tres sitios bloquean al bot el 100% del tiempo
+  (**Quetzaltenango/Xela —cabecera—, Salcajá, San José Ojetenam**): vivos por
+  navegador pero **no auditables por HTTP** → `nivel_laip` **indefinido**, no "No_cumple".
+- **OE1:** sitios livianos y rápidos (peso mediano ~20 KB, carga ~1.0 s, TTFB ~0.77 s),
+  pero **solo 13/35 (~37%) tiene viewport móvil** → la brecha es de **accesibilidad
+  móvil**, no de velocidad. El instrumento **no captura Core Web Vitals** (mide
+  TTFB/carga/peso/viewport/lang/alt).
+- **OE2 (hallazgo central):** **0/38 cumple los 7 apartados LAIP** (28 No_cumple, 7
+  Limitado, 0 Pleno, 3 sin dato HTTP). Por apartado (sobre 35): transparencia 34%,
+  contacto 29%, estructura 20%, servicios 14%, presupuesto 9%, personal 9%,
+  compras/contrataciones 3%. **Frescura (Wayback, 36/38):** mediana **188 días** sin
+  actualizar (P25 67, P75 376); **44% con >270 días**.
+- **OE3:** cifrado correcto (SSL válido 32/35, TLS 1.2/1.3) pero **~77% (27/35)
+  vulnerables** por **headers de configuración** (X-Frame-Options 0%, HSTS 9% [3/35],
+  CSP ~20%, solo 65% fuerza HTTPS). SSL: 2 hostname_mismatch, 1 autofirmado.
+  (Proporciones sobre **35 auditables**, excluyendo los 3 sin dato HTTP.)
 - **OE4:** **ninguna asociación significativa** (α=0.05) entre departamento/cabecera/
-  hosting/calidad y LAIP o vulnerabilidad. Conclusión: las deficiencias son
-  **sistémicas y transversales**, no de un subgrupo. La logística no converge (n chico).
+  hosting y LAIP o vulnerabilidad. V de Cramér a lo sumo mediana (departamento–LAIP
+  ≈0.40; hosting–vulnerabilidad ≈0.36). La logística **converge** (selecciona `cabecera`)
+  pero es no significativa y con pseudo-R²≈0. Conclusión: deficiencias **sistémicas y
+  transversales** — no rechazar la independencia **ES** el resultado.
 
 ---
 
 ## 12. Pendientes / a tener presente
 
+- **Redefinir `calidad_tecnica`** antes de reincorporarla como predictor del OE4: hoy
+  sale de un score interno inflado (el peso mide solo el HTML) que comparte información
+  con las respuestas (sobre todo seguridad) → asociaciones circulares. Excluida por ahora.
 - **3 sitios siempre-403** (incluida la cabecera Quetzaltenango): reportarlos como
   "no auditables por HTTP", no como caídos ni incumplidores. Posible mejora futura:
   extraer el HTML por navegador para medirles LAIP/SSL (cambiaría el alcance).
-- **OE4 con n pequeño**: sin asociaciones significativas y logística sin converger;
-  reevaluar al acumular más datos (o usar logística penalizada/Firth).
+- **OE4 con n pequeño**: sin asociaciones significativas; la logística converge pero sin
+  poder explicativo. Reevaluar al acumular más datos (o logística penalizada/Firth).
 - **Rotar** los secretos que se filtraron en el chat (`PAGESPEED_API_KEY`, PAT).
-- Caídas reales a vigilar: **Cajolá, El Asintal, Pajapita**.
+- Uptime bajo real a vigilar: **Cajolá (~51%)**.
 
 ---
 
@@ -316,3 +353,47 @@ python main.py --dashboard           # solo dashboard HTML
 7. Al cambiar comportamiento, actualizar `README.md` **y este `CLAUDE.md`**.
 8. Respetar todas las reglas de §3 (sin proxies, no tocar `municipios.yaml`, solo
    Suroccidente, no borrar caídas, no exponer secretos).
+
+---
+
+## 14. Documentos de la tesis — versiones y estado (al 2026-07-12)
+
+Los `.docx` viven en la raíz del repo. **Autoritativo vs. complementarios:**
+
+- **`Anteproyecto.docx` — ANTEPROYECTO FINAL (fuente de verdad).** Aprobado
+  (calificación 83.9). Es una **propuesta**: datos de mayo 2026 (35.5%, n=39 portales,
+  `cumple_LAIP` estricto). Estructura: 1 Introducción · 2 Antecedentes (12 fuentes
+  discutidas) · 3 Planteamiento · 4 Justificación · 5 Objetivos · 6 Necesidades y
+  esquema de solución · 7 Glosario · 8 Referencias (15, con fichas Análisis y Aporte) ·
+  9 Anexos (A Gráficas · B Operacionalización · C Cronograma · D Árbol · E Matriz).
+  Correcciones de la catedrática ya aplicadas: antecedentes ≥10, motivación personal,
+  sección autónoma de Necesidades, y Árbol/Matriz movidos a Anexos.
+- **`Anteproyecto_futuro.docx` — BORRADOR DEL PRÓXIMO CURSO (fase de resultados).**
+  Es `Anteproyecto.docx` alineado a lo que el software realmente hace y midió (corte
+  julio 2026). **NO es el anteproyecto**; se retoma en el siguiente curso. Diferencias:
+  - Unidad de análisis = **municipio**, **n = 38** (39 portales; Cajolá 2 URLs → 1).
+    Denominador unificado a **111 municipalidades**; cobertura 39/111 = **35.1%**
+    (IC Wilson 95% 26.9–44.4).
+  - LAIP: **`nivel_laip`** ordinal (Pleno/Limitado/No_cumple) + **`cumple_mayoria_LAIP`**
+    binaria para la logística.
+  - **Aporte movido a Antecedentes y quitado de Referencias** (observación de un
+    compañero): el aporte de cada fuente se discute en la narrativa de Antecedentes;
+    Referencias deja solo cita APA + Análisis.
+  - OE1 real: TTFB/carga/peso/viewport/lang/alt; Web Vitals y WCAG como **marco
+    conceptual** (no se capturan Core Web Vitals de campo).
+  - OE2: apartados LAIP por HTTP en cada corrida; "días sin actualizar" aparte vía
+    Wayback/CDX.
+  - Uptime = alcanzable por HTTP **o** navegador (Playwright; anti-bot 401/403/429; sin
+    proxies/captchas); métricas de contenido solo de HTTP; caveat de los 3 siempre-403.
+  - Recolección "en **días y horas aleatorios**" (3–7 días/sem), no "diaria".
+  - No convergencia de la logística documentada (contempla Firth). Anexo A conserva la
+    línea base de mayo y añade el **corte de julio 2026**.
+- **`Matriz de coherencia.docx`** — complementario (matriz suelta para la plataforma).
+
+**Distinción de géneros (respetar):** el *anteproyecto* (`Anteproyecto.docx`) es
+propuesta y **no** lleva resultados; la recategorización LAIP y los datos del corte van
+en `Anteproyecto_futuro.docx` (resultados, próximo curso).
+
+**Nota:** existió en *otro chat* una variante con 10 antecedentes y 5 referencias
+nuevas reales (→ 20 referencias) que **no** está en la carpeta; se optó por
+`Anteproyecto.docx` (12 antecedentes con las 15 existentes), que ya cumple el mínimo de 10.
