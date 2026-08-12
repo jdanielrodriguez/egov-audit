@@ -304,6 +304,20 @@ def _resumen_ejecutivo(df: pd.DataFrame) -> pd.DataFrame:
         s = pd.to_numeric(df[col], errors="coerce").dropna()
         return round(s.mean(), 2) if not s.empty else None
 
+    def mediana(col):
+        if col not in df.columns:
+            return None
+        s = pd.to_numeric(df[col], errors="coerce").dropna()
+        return round(s.median(), 2) if not s.empty else None
+
+    def percentiles(col):
+        if col not in df.columns:
+            return None
+        s = pd.to_numeric(df[col], errors="coerce").dropna()
+        if s.empty:
+            return None
+        return f"P25={round(s.quantile(0.25),0)} / P75={round(s.quantile(0.75),0)}"
+
     filas = [
         ("Municipalidades evaluadas (total)", total, ""),
         ("Municipalidades alcanzables (reachable)", reach, f"{round(reach/total*100,2) if total else 0}%"),
@@ -320,6 +334,8 @@ def _resumen_ejecutivo(df: pd.DataFrame) -> pd.DataFrame:
         ("", "", ""),
         ("— OE2: FRESCURA Y TRANSPARENCIA LAIP —", "", ""),
         ("Snapshots Wayback medios por portal", media("snapshots_unicos"), ""),
+        ("Días MEDIANA desde última actualización", mediana("dias_desde_ultima_actualizacion"), ""),
+        ("Días desde última actualización (P25/P75)", percentiles("dias_desde_ultima_actualizacion"), ""),
         ("Días promedio desde última actualización", media("dias_desde_ultima_actualizacion"), ""),
         ("Cumplimiento LAIP medio", media("laip_pct_cumplimiento"), "%"),
         ("% portales con sección de transparencia", pct_true("laip_transparencia"), "%"),

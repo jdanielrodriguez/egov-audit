@@ -20,7 +20,7 @@ from __future__ import annotations
 import re
 import statistics
 import unicodedata
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List
 from urllib.parse import urlparse
 
@@ -56,6 +56,8 @@ def _consultar_wayback(url: str) -> Dict[str, Any]:
 
     params = {
         "url": dominio,
+        "matchType": "prefix",  # todo el portal (dominio/*), no solo la home:
+                                # una subpágina actualizada también cuenta como frescura
         "from": ANALISIS_DESDE,
         "to": ANALISIS_HASTA,
         "output": "json",
@@ -121,7 +123,8 @@ def _consultar_wayback(url: str) -> Dict[str, Any]:
             out["snapshots_por_anio"] = dict(sorted(por_anio.items()))
             out["actualizaciones_unicas_2025_2026"] = unicos_recientes
 
-            ahora = datetime.utcnow()
+            # UTC naive (los timestamps de Wayback son naive); evita utcnow() deprecado.
+            ahora = datetime.now(timezone.utc).replace(tzinfo=None)
             out["dias_desde_ultima_actualizacion"] = (ahora - timestamps[-1]).days
 
             if len(timestamps) >= 2:
