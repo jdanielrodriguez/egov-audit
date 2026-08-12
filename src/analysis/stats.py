@@ -501,6 +501,98 @@ def regresion_logistica_binaria(
     return tabla, metricas
 
 
+def _modelo_estable(tabla: Optional[pd.DataFrame],
+                    max_coef: float = 15.0, max_se: float = 25.0) -> bool:
+    """
+    Detecta separación cuasi-perfecta que el flag `converged` de statsmodels NO
+    captura: cuando un nivel está separado, su coeficiente se dispara (|β|≫10) y
+    su error estándar explota (miles/millones). Un modelo es "estable" solo si
+    todos los |β| y errores estándar están acotados y son finitos.
+    """
+    if tabla is None or tabla.empty:
+        return False
+    coefs = pd.to_numeric(tabla["coef"], errors="coerce").abs()
+    ses = pd.to_numeric(tabla["std_err"], errors="coerce").abs()
+    if not (np.isfinite(coefs).all() and np.isfinite(ses).all()):
+        return False
+    return bool(coefs.max() <= max_coef and ses.max() <= max_se)
+
+
+def regresion_logistica_seleccionada(
+    df_cat: pd.DataFrame,
+    var_respuesta: str,
+    predictores_candidatos: List[str],
+    nivel_positivo: str,
+    *,
+    max_predictores: int = 3,
+) -> Tuple[Optional[pd.DataFrame], Dict[str, Any]]:
+    """
+    Ajusta la logística siguiendo el protocolo del estudio: se seleccionan HASTA
+    `max_predictores` de los candidatos, ordenados por su significancia en el
+    análisis bivariado (menor p primero), y se AÑADEN uno a uno solo si el modelo
+    resultante CONVERGE (selección hacia adelante con guarda de convergencia).
+
+    Así se respeta la regla de eventos por predictor y se evita la separación
+    cuasi-perfecta que produce meter todos los predictores a la vez (predictores
+    con muchos niveles o categorías raras rompen la MLE). Si ningún subconjunto
+    converge, se reporta y la inferencia recae en χ²/Fisher/V de Cramér.
+    """
+    if not _SM_OK:
+        return None, {"error": "statsmodels no está instalado"}
+
+    candidatos = [p for p in predictores_candidatos if p in df_cat.columns]
+    if not candidatos:
+        return None, {"error": "sin predictores candidatos en el DataFrame"}
+
+    # 1) Orden por significancia bivariada contra la MISMA respuesta que se modela.
+    orden = candidatos
+    ranking = pruebas_chi_cuadrado(df_cat, var_respuesta, candidatos)
+    if ranking is not None and not ranking.empty and "p_recomendado" in ranking.columns:
+        rk = ranking.dropna(subset=["p_recomendado"]).sort_values("p_recomendado")
+        orden = [p for p in rk["predictor"].tolist() if p in candidatos]
+        orden += [p for p in candidatos if p not in orden]  # los sin p, al final
+
+    # 2) Selección hacia adelante con guarda de convergencia.
+    seleccionados: List[str] = []
+    descartados: List[Dict[str, str]] = []
+    for pred in orden:
+        if len(seleccionados) >= max_predictores:
+            descartados.append({"predictor": pred, "razon": f"tope de {max_predictores} predictores"})
+            continue
+        tabla, met = regresion_logistica_binaria(
+            df_cat, var_respuesta, seleccionados + [pred], nivel_positivo
+        )
+        if tabla is None:
+            descartados.append({"predictor": pred, "razon": met.get("error", "ajuste fallido")})
+        elif not met.get("convergio"):
+            descartados.append({"predictor": pred, "razon": "el modelo no converge al añadirlo"})
+        elif not _modelo_estable(tabla):
+            descartados.append({"predictor": pred, "razon": "separacion en algun nivel (coeficientes/IC inestables)"})
+        else:
+            seleccionados.append(pred)
+
+    criterio = (f"selección hacia adelante por significancia bivariada "
+                f"(máx {max_predictores}) con guarda de convergencia")
+    if not seleccionados:
+        return None, {
+            "convergio": False,
+            "predictores_seleccionados": [],
+            "predictores_descartados": descartados,
+            "criterio_seleccion": criterio,
+            "nota": ("Ningun subconjunto de predictores produjo un modelo logistico "
+                     "convergente (separacion por muestra pequena / categorias "
+                     "desbalanceadas). La inferencia del OE4 recae en chi-cuadrado/"
+                     "Fisher/V de Cramer; se contempla logistica penalizada (Firth)."),
+        }
+
+    tabla, met = regresion_logistica_binaria(df_cat, var_respuesta, seleccionados, nivel_positivo)
+    if met is not None:
+        met["predictores_seleccionados"] = seleccionados
+        met["predictores_descartados"] = descartados
+        met["criterio_seleccion"] = criterio
+    return tabla, met
+
+
 def analisis_oe4_completo(
     df: pd.DataFrame,
     umbral_laip: float = 50.0,
@@ -525,15 +617,17 @@ def analisis_oe4_completo(
         if "cat_vulnerable" in df_cat.columns else pd.DataFrame()
 
     # Regresión logística binaria de LAIP: sobre la dicotomía "alcanza al menos
-    # la mayoría" (Pleno+Limitado = Cumple) vs No_cumple.
+    # la mayoría" (Pleno+Limitado = Cumple) vs No_cumple. Se seleccionan 2-3
+    # predictores por significancia bivariada (protocolo del estudio), evitando
+    # la separación de meter todos a la vez.
     coef_laip, met_laip = (None, {"error": "sin variable cat_cumple_mayoria"})
     if "cat_cumple_mayoria" in df_cat.columns:
-        coef_laip, met_laip = regresion_logistica_binaria(
+        coef_laip, met_laip = regresion_logistica_seleccionada(
             df_cat, "cat_cumple_mayoria", predictores, "Cumple"
         )
     coef_vuln, met_vuln = (None, {"error": "sin variable cat_vulnerable"})
     if "cat_vulnerable" in df_cat.columns:
-        coef_vuln, met_vuln = regresion_logistica_binaria(
+        coef_vuln, met_vuln = regresion_logistica_seleccionada(
             df_cat, "cat_vulnerable", predictores, "Vulnerable"
         )
 
