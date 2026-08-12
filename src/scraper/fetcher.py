@@ -162,15 +162,24 @@ def fetch(url: str, *, method: str = "GET") -> FetchResult:
                 url,
                 timeout=HTTP_TIMEOUT,
                 allow_redirects=True,
+                stream=True,
                 verify=False,
             )
+            t_ttfb = time.perf_counter()
+            contenido = resp.content
             t_fin = time.perf_counter()
             res.status_code = resp.status_code
-            res.reachable = True
+            # Alcanzable SOLO si el status es 2xx/3xx, igual que en la ruta normal.
+            # Que el fallback no lance excepción no implica que el sitio responda
+            # bien: un 500/404 con certificado inválido NO debe contar como exitosa.
+            res.reachable = bool(resp.ok or (resp.status_code and 200 <= resp.status_code < 400))
             res.url_final = resp.url
+            res.ttfb_ms = round((t_ttfb - t_inicio) * 1000, 2)
             res.tiempo_total_ms = round((t_fin - t_inicio) * 1000, 2)
+            res.tamanio_bytes = len(contenido)
             res.headers = {k: v for k, v in resp.headers.items()}
-            res.tamanio_bytes = len(resp.content)
+            res.redirecciones = len(resp.history)
+            res.https = res.url_final.startswith("https://") if res.url_final else False
             res.error = f"SSLError: {ex.__class__.__name__}"
             res.contenido_html = resp.text
         except Exception as ex2:
