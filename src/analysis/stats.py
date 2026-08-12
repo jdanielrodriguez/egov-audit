@@ -373,10 +373,19 @@ def pruebas_chi_cuadrado(
             except ValueError:
                 p_fisher = None
         elif freq_bajas:
+            # Tabla RxC con celdas escasas: prueba de PERMUTACIÓN (preserva los
+            # márgenes), más fiable que el χ² asintótico con muestra pequeña.
+            # scipy ≥1.9 exige una instancia PermutationMethod + correction=False;
+            # el string "monte-carlo" NO es válido (lanzaba ValueError → asintótico).
+            # Si scipy no soporta la API, cae al asintótico (except).
             try:
-                res = stats.chi2_contingency(tabla.values, method="monte-carlo")
+                res = stats.chi2_contingency(
+                    tabla.values,
+                    method=stats.PermutationMethod(n_resamples=9999),
+                    correction=False,
+                )
                 p_fisher = float(res.pvalue)
-                metodo_fisher = "Chi² Monte Carlo (RxC)"
+                metodo_fisher = "Chi² Monte Carlo/permutación (RxC)"
             except (ValueError, TypeError, AttributeError):
                 p_fisher = None
 
@@ -604,8 +613,13 @@ def analisis_oe4_completo(
     """
     df_cat = preparar_variables_categoricas(df, umbral_laip=umbral_laip)
 
+    # Predictores CONFIABLES del OE4. Se excluye 'cat_calidad_tecnica': se deriva
+    # de un score interno (parcialmente inflado: el peso mide solo el HTML) que
+    # comparte información con las variables respuesta (sobre todo seguridad), por
+    # lo que usarla como predictor produce asociaciones circulares/artefactuales.
+    # Queda pendiente REDEFINIRLA antes de reincorporarla (ver CLAUDE.md §12).
     predictores = [c for c in (
-        "cat_departamento", "cat_cabecera", "cat_tipo_hosting", "cat_calidad_tecnica"
+        "cat_departamento", "cat_cabecera", "cat_tipo_hosting"
     ) if c in df_cat.columns]
 
     # χ²/Fisher/Cramér de LAIP: sobre el nivel de 3 categorías (Pleno/Limitado/
