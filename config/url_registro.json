@@ -246,11 +246,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T10:46:49-06:00",
         "url": "https://munimazate.gob.gt"
+      },
+      {
+        "detalle": "muerta 12x (incl. navegador), sin reemplazo; se mantiene",
+        "evento": "caida",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T17:35:14-06:00",
+        "url": "https://munimazate.gob.gt"
       }
     ],
-    "fallos_consecutivos": 11,
+    "fallos_consecutivos": 12,
     "municipio": "Mazatenango",
-    "ultima_verificacion": "2026-09-26T10:46:49-06:00",
+    "ultima_verificacion": "2026-09-26T17:35:14-06:00",
     "url_vigente": "https://munimazate.gob.gt"
   },
   "1008": {
@@ -500,11 +507,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T11:05:05-06:00",
         "url": "https://www.munisamayac.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T17:51:40-06:00",
+        "url": "https://www.munisamayac.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Samayac",
-    "ultima_verificacion": "2026-09-26T11:05:05-06:00",
+    "ultima_verificacion": "2026-09-26T17:51:40-06:00",
     "url_vigente": "https://www.munisamayac.gob.gt"
   },
   "1014": {
@@ -754,11 +768,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T11:19:55-06:00",
         "url": "https://www.munipatulul.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:05:00-06:00",
+        "url": "https://www.munipatulul.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Patulul",
-    "ultima_verificacion": "2026-09-26T11:19:55-06:00",
+    "ultima_verificacion": "2026-09-26T18:05:00-06:00",
     "url_vigente": "https://www.munipatulul.gob.gt"
   },
   "1020": {
@@ -1008,11 +1029,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T11:34:57-06:00",
         "url": "https://www.muniriobravo.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:18:42-06:00",
+        "url": "https://www.muniriobravo.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Río Bravo",
-    "ultima_verificacion": "2026-09-26T11:34:57-06:00",
+    "ultima_verificacion": "2026-09-26T18:18:42-06:00",
     "url_vigente": "https://www.muniriobravo.gob.gt"
   },
   "1101": {
@@ -1262,11 +1290,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:34:22-06:00",
         "url": "https://www.munireu.gob.gt/"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:29:29-06:00",
+        "url": "https://www.munireu.gob.gt/"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Retalhuleu",
-    "ultima_verificacion": "2026-09-26T09:34:22-06:00",
+    "ultima_verificacion": "2026-09-26T16:29:29-06:00",
     "url_vigente": "https://www.munireu.gob.gt/"
   },
   "1105": {
@@ -1516,11 +1551,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:44:14-06:00",
         "url": "https://munisanfelipe.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:38:26-06:00",
+        "url": "https://munisanfelipe.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San Felipe",
-    "ultima_verificacion": "2026-09-26T09:44:14-06:00",
+    "ultima_verificacion": "2026-09-26T16:38:26-06:00",
     "url_vigente": "https://munisanfelipe.gob.gt"
   },
   "1108": {
@@ -1770,11 +1812,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:49:10-06:00",
         "url": "https://www.municipalidaddenuevosancarlos.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:42:53-06:00",
+        "url": "https://www.municipalidaddenuevosancarlos.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Nuevo San Carlos",
-    "ultima_verificacion": "2026-09-26T09:49:10-06:00",
+    "ultima_verificacion": "2026-09-26T16:42:53-06:00",
     "url_vigente": "https://www.municipalidaddenuevosancarlos.gob.gt"
   },
   "1109": {
@@ -2024,11 +2073,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:52:32-06:00",
         "url": "https://munielasintal.gob.gt"
+      },
+      {
+        "detalle": "muerta 36x (incl. navegador), sin reemplazo; se mantiene",
+        "evento": "caida",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:45:54-06:00",
+        "url": "https://munielasintal.gob.gt"
       }
     ],
-    "fallos_consecutivos": 35,
+    "fallos_consecutivos": 36,
     "municipio": "El Asintal",
-    "ultima_verificacion": "2026-09-26T09:52:32-06:00",
+    "ultima_verificacion": "2026-09-26T16:45:54-06:00",
     "url_vigente": "https://munielasintal.gob.gt"
   },
   "1201": {
@@ -2278,11 +2334,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:52:32-06:00",
         "url": "https://municipalidaddesanmarcos.gob.gt"
+      },
+      {
+        "detalle": "acceso restringido (403/401/429); el sitio existe, se mantiene",
+        "evento": "restringido",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:45:55-06:00",
+        "url": "https://municipalidaddesanmarcos.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San Marcos",
-    "ultima_verificacion": "2026-09-26T09:52:32-06:00",
+    "ultima_verificacion": "2026-09-26T16:45:55-06:00",
     "url_vigente": "https://municipalidaddesanmarcos.gob.gt"
   },
   "1204": {
@@ -2532,11 +2595,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:59:05-06:00",
         "url": "https://municomitancillo.com.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:51:52-06:00",
+        "url": "https://municomitancillo.com.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Comitancillo",
-    "ultima_verificacion": "2026-09-26T09:59:05-06:00",
+    "ultima_verificacion": "2026-09-26T16:51:52-06:00",
     "url_vigente": "https://municomitancillo.com.gt"
   },
   "1206": {
@@ -2786,11 +2856,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T10:02:23-06:00",
         "url": "https://municoncepciontutuapa.com"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:54:54-06:00",
+        "url": "https://municoncepciontutuapa.com"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Concepción Tutuapa",
-    "ultima_verificacion": "2026-09-26T10:02:23-06:00",
+    "ultima_verificacion": "2026-09-26T16:54:54-06:00",
     "url_vigente": "https://municoncepciontutuapa.com"
   },
   "1209": {
@@ -3040,11 +3117,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T10:05:39-06:00",
         "url": "https://www.munitajumulco.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:57:52-06:00",
+        "url": "https://www.munitajumulco.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Tajumulco",
-    "ultima_verificacion": "2026-09-26T10:05:39-06:00",
+    "ultima_verificacion": "2026-09-26T16:57:52-06:00",
     "url_vigente": "https://www.munitajumulco.gob.gt"
   },
   "1213": {
@@ -3294,11 +3378,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T10:13:42-06:00",
         "url": "https://munieltumbador.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T17:05:17-06:00",
+        "url": "https://munieltumbador.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "El Tumbador",
-    "ultima_verificacion": "2026-09-26T10:13:42-06:00",
+    "ultima_verificacion": "2026-09-26T17:05:17-06:00",
     "url_vigente": "https://munieltumbador.gob.gt"
   },
   "1216": {
@@ -3548,11 +3639,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T10:18:43-06:00",
         "url": "https://www.municatarina.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T17:09:45-06:00",
+        "url": "https://www.municatarina.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Catarina",
-    "ultima_verificacion": "2026-09-26T10:18:43-06:00",
+    "ultima_verificacion": "2026-09-26T17:09:45-06:00",
     "url_vigente": "https://www.municatarina.gob.gt"
   },
   "1219": {
@@ -3802,11 +3900,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T10:21:54-06:00",
         "url": "https://www.munisanpablo.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T17:12:38-06:00",
+        "url": "https://www.munisanpablo.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San Pablo",
-    "ultima_verificacion": "2026-09-26T10:21:54-06:00",
+    "ultima_verificacion": "2026-09-26T17:12:38-06:00",
     "url_vigente": "https://www.munisanpablo.gob.gt"
   },
   "1222": {
@@ -4056,11 +4161,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T10:28:28-06:00",
         "url": "https://munipajapita.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T17:18:36-06:00",
+        "url": "https://munipajapita.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Pajapita",
-    "ultima_verificacion": "2026-09-26T10:28:28-06:00",
+    "ultima_verificacion": "2026-09-26T17:18:36-06:00",
     "url_vigente": "https://munipajapita.gob.gt"
   },
   "1224": {
@@ -4310,11 +4422,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T10:30:06-06:00",
         "url": "https://www.munisanjoseojetenam.gob.gt"
+      },
+      {
+        "detalle": "acceso restringido (403/401/429); el sitio existe, se mantiene",
+        "evento": "restringido",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T17:20:05-06:00",
+        "url": "https://www.munisanjoseojetenam.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San José Ojetenam",
-    "ultima_verificacion": "2026-09-26T10:30:06-06:00",
+    "ultima_verificacion": "2026-09-26T17:20:05-06:00",
     "url_vigente": "https://www.munisanjoseojetenam.gob.gt"
   },
   "1228": {
@@ -4564,11 +4683,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T10:36:39-06:00",
         "url": "https://munirioblanco.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T17:26:04-06:00",
+        "url": "https://munirioblanco.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Río Blanco",
-    "ultima_verificacion": "2026-09-26T10:36:39-06:00",
+    "ultima_verificacion": "2026-09-26T17:26:04-06:00",
     "url_vigente": "https://munirioblanco.gob.gt"
   },
   "701": {
@@ -4818,11 +4944,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T11:56:05-06:00",
         "url": "https://municipalidaddesolola.gob.gt/"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:38:02-06:00",
+        "url": "https://municipalidaddesolola.gob.gt/"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Sololá",
-    "ultima_verificacion": "2026-09-26T11:56:05-06:00",
+    "ultima_verificacion": "2026-09-26T18:38:02-06:00",
     "url_vigente": "https://municipalidaddesolola.gob.gt/"
   },
   "702": {
@@ -5072,11 +5205,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T11:56:05-06:00",
         "url": "https://sanjosechacaya.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:38:02-06:00",
+        "url": "https://sanjosechacaya.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San José Chacayá",
-    "ultima_verificacion": "2026-09-26T11:56:05-06:00",
+    "ultima_verificacion": "2026-09-26T18:38:02-06:00",
     "url_vigente": "https://sanjosechacaya.gob.gt"
   },
   "704": {
@@ -5326,11 +5466,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T11:59:19-06:00",
         "url": "https://www.munisantaluciautatlan.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:41:01-06:00",
+        "url": "https://www.munisantaluciautatlan.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Santa Lucía Utatlán",
-    "ultima_verificacion": "2026-09-26T11:59:19-06:00",
+    "ultima_verificacion": "2026-09-26T18:41:01-06:00",
     "url_vigente": "https://www.munisantaluciautatlan.gob.gt"
   },
   "710": {
@@ -5580,11 +5727,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T12:12:17-06:00",
         "url": "https://municipalidaddepanajachel.gob.gt/"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:52:53-06:00",
+        "url": "https://municipalidaddepanajachel.gob.gt/"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Panajachel",
-    "ultima_verificacion": "2026-09-26T12:12:17-06:00",
+    "ultima_verificacion": "2026-09-26T18:52:53-06:00",
     "url_vigente": "https://municipalidaddepanajachel.gob.gt/"
   },
   "711": {
@@ -5834,11 +5988,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T12:12:18-06:00",
         "url": "https://www.munisantacatarinapalopo.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:52:54-06:00",
+        "url": "https://www.munisantacatarinapalopo.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Santa Catarina Palopó",
-    "ultima_verificacion": "2026-09-26T12:12:18-06:00",
+    "ultima_verificacion": "2026-09-26T18:52:54-06:00",
     "url_vigente": "https://www.munisantacatarinapalopo.gob.gt"
   },
   "713": {
@@ -6088,11 +6249,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T12:15:34-06:00",
         "url": "https://www.munisanlucas.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:55:51-06:00",
+        "url": "https://www.munisanlucas.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San Lucas Tolimán",
-    "ultima_verificacion": "2026-09-26T12:15:34-06:00",
+    "ultima_verificacion": "2026-09-26T18:55:51-06:00",
     "url_vigente": "https://www.munisanlucas.gob.gt"
   },
   "719": {
@@ -6342,11 +6510,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T12:32:25-06:00",
         "url": "https://munisantiagoatitlan.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T19:10:46-06:00",
+        "url": "https://munisantiagoatitlan.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Santiago Atitlán",
-    "ultima_verificacion": "2026-09-26T12:32:25-06:00",
+    "ultima_verificacion": "2026-09-26T19:10:46-06:00",
     "url_vigente": "https://munisantiagoatitlan.gob.gt"
   },
   "801": {
@@ -6596,11 +6771,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T11:38:13-06:00",
         "url": "https://munitotonicapan.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:21:38-06:00",
+        "url": "https://munitotonicapan.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Totonicapán",
-    "ultima_verificacion": "2026-09-26T11:38:13-06:00",
+    "ultima_verificacion": "2026-09-26T18:21:38-06:00",
     "url_vigente": "https://munitotonicapan.gob.gt"
   },
   "803": {
@@ -6850,11 +7032,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T11:41:31-06:00",
         "url": "https://sitio.munisanfranciscoelalto.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T18:24:39-06:00",
+        "url": "https://sitio.munisanfranciscoelalto.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San Francisco El Alto",
-    "ultima_verificacion": "2026-09-26T11:41:31-06:00",
+    "ultima_verificacion": "2026-09-26T18:24:39-06:00",
     "url_vigente": "https://sitio.munisanfranciscoelalto.gob.gt"
   },
   "901": {
@@ -7090,11 +7279,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:01:14-06:00",
         "url": "https://munixela.gob.gt"
+      },
+      {
+        "detalle": "acceso restringido (403/401/429); el sitio existe, se mantiene",
+        "evento": "restringido",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:01:16-06:00",
+        "url": "https://munixela.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Quetzaltenango",
-    "ultima_verificacion": "2026-09-26T09:01:14-06:00",
+    "ultima_verificacion": "2026-09-26T16:01:16-06:00",
     "url_vigente": "https://munixela.gob.gt"
   },
   "902": {
@@ -7344,11 +7540,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:01:15-06:00",
         "url": "https://www.salcaja.gob.gt/"
+      },
+      {
+        "detalle": "acceso restringido (403/401/429); el sitio existe, se mantiene",
+        "evento": "restringido",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:01:17-06:00",
+        "url": "https://www.salcaja.gob.gt/"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Salcajá",
-    "ultima_verificacion": "2026-09-26T09:01:15-06:00",
+    "ultima_verificacion": "2026-09-26T16:01:17-06:00",
     "url_vigente": "https://www.salcaja.gob.gt/"
   },
   "907": {
@@ -7598,11 +7801,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:10:21-06:00",
         "url": "https://www.municajola.com"
+      },
+      {
+        "detalle": "muerta 36x (incl. navegador), sin reemplazo; se mantiene",
+        "evento": "caida",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:10:16-06:00",
+        "url": "https://www.municajola.com"
       }
     ],
-    "fallos_consecutivos": 35,
+    "fallos_consecutivos": 36,
     "municipio": "Cajolá",
-    "ultima_verificacion": "2026-09-26T09:10:21-06:00",
+    "ultima_verificacion": "2026-09-26T16:10:16-06:00",
     "url_vigente": "https://www.municajola.com"
   },
   "909": {
@@ -7852,11 +8062,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:13:47-06:00",
         "url": "https://www.munisanjuanostuncalco.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:13:37-06:00",
+        "url": "https://www.munisanjuanostuncalco.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San Juan Ostuncalco",
-    "ultima_verificacion": "2026-09-26T09:13:47-06:00",
+    "ultima_verificacion": "2026-09-26T16:13:37-06:00",
     "url_vigente": "https://www.munisanjuanostuncalco.gob.gt"
   },
   "910": {
@@ -8106,11 +8323,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:13:48-06:00",
         "url": "https://munisanmateo.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:13:39-06:00",
+        "url": "https://munisanmateo.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San Mateo",
-    "ultima_verificacion": "2026-09-26T09:13:48-06:00",
+    "ultima_verificacion": "2026-09-26T16:13:39-06:00",
     "url_vigente": "https://munisanmateo.gob.gt"
   },
   "915": {
@@ -8360,11 +8584,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:25:58-06:00",
         "url": "https://www.munihuitan.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:21:38-06:00",
+        "url": "https://www.munihuitan.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Huitán",
-    "ultima_verificacion": "2026-09-26T09:25:58-06:00",
+    "ultima_verificacion": "2026-09-26T16:21:38-06:00",
     "url_vigente": "https://www.munihuitan.gob.gt"
   },
   "918": {
@@ -8614,11 +8845,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:29:20-06:00",
         "url": "https://municipalidadsanfranciscolaunion.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:24:49-06:00",
+        "url": "https://municipalidadsanfranciscolaunion.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "San Francisco La Unión",
-    "ultima_verificacion": "2026-09-26T09:29:20-06:00",
+    "ultima_verificacion": "2026-09-26T16:24:49-06:00",
     "url_vigente": "https://municipalidadsanfranciscolaunion.gob.gt"
   },
   "920": {
@@ -8868,11 +9106,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:32:37-06:00",
         "url": "https://municoatepeque.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:27:49-06:00",
+        "url": "https://municoatepeque.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Coatepeque",
-    "ultima_verificacion": "2026-09-26T09:32:37-06:00",
+    "ultima_verificacion": "2026-09-26T16:27:49-06:00",
     "url_vigente": "https://municoatepeque.gob.gt"
   },
   "921": {
@@ -9122,11 +9367,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:32:43-06:00",
         "url": "https://munigenova.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:27:58-06:00",
+        "url": "https://munigenova.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Génova",
-    "ultima_verificacion": "2026-09-26T09:32:43-06:00",
+    "ultima_verificacion": "2026-09-26T16:27:58-06:00",
     "url_vigente": "https://munigenova.gob.gt"
   },
   "923": {
@@ -9376,11 +9628,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:34:21-06:00",
         "url": "https://www.munilaesperanza.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:29:28-06:00",
+        "url": "https://www.munilaesperanza.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "La Esperanza",
-    "ultima_verificacion": "2026-09-26T09:34:21-06:00",
+    "ultima_verificacion": "2026-09-26T16:29:28-06:00",
     "url_vigente": "https://www.munilaesperanza.gob.gt"
   },
   "924": {
@@ -9630,11 +9889,18 @@
         "fecha": "2026-09-26",
         "ts": "2026-09-26T09:34:22-06:00",
         "url": "https://www.munipalestinadelosaltos.gob.gt"
+      },
+      {
+        "detalle": "",
+        "evento": "verificada_ok",
+        "fecha": "2026-09-26",
+        "ts": "2026-09-26T16:29:29-06:00",
+        "url": "https://www.munipalestinadelosaltos.gob.gt"
       }
     ],
     "fallos_consecutivos": 0,
     "municipio": "Palestina de Los Altos",
-    "ultima_verificacion": "2026-09-26T09:34:22-06:00",
+    "ultima_verificacion": "2026-09-26T16:29:29-06:00",
     "url_vigente": "https://www.munipalestinadelosaltos.gob.gt"
   }
 }
